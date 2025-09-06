@@ -1,1 +1,1 @@
-// Muestra PGC de sun sistema de gestion hotelera
+// Muestra PGC de un sistema de gestion hotelera
