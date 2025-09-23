@@ -430,7 +430,7 @@ public class Reserva extends javax.swing.JFrame {
             String fechaActual = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 
             // Validar existencia de la ruta antes de escribir el archivo
-            File directorio = new File("\"C:\\Users\\elian\\Desktop\\universidad proyectos\\HOTEL2.1\\HOTEL2.0\\Facturas_reservas\"");
+            File directorio = new File("Facturas_reservas");
             if (!directorio.exists() || !directorio.isDirectory()) {
                 throw new TicketNoGeneradoException(CodigoError.ERR_GENERAR_TICKET,
                         "La ruta para guardar la factura no existe: " + directorio.getAbsolutePath());

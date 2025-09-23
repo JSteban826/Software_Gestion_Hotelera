@@ -5,12 +5,14 @@ import LOGICA.CorreoPago;
 import PERSISTENCIA.ConexionBD;
 import LOGICA.Cliente;
 import LOGICA.ClienteNoExisteException;
+import LOGICA.CodigoError;
 import LOGICA.HistorialManager;
 import LOGICA.HistorialManagerSingleton;
 import LOGICA.Reservas;
 import static LOGICA.enviarCorreoConAdjunto.enviarCorreoConAdjunto;
 import LOGICA.CorreoNoEnviadoException;
 import LOGICA.ManejadorErrores;
+import LOGICA.TicketNoGeneradoException;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -22,6 +24,7 @@ import java.util.Locale;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import com.toedter.calendar.JDateChooser;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.sql.Connection;
 import java.sql.SQLIntegrityConstraintViolationException;
@@ -322,7 +325,15 @@ public class check_out extends javax.swing.JFrame {
             
             String fechaActual = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
             String nombreArchivo = "factura_check_out_" + idCliente + "_" + fechaActual + ".pdf";
-            String ruta = "C:\\Users\\elian\\Desktop\\universidad proyectos\\HOTEL2.1\\HOTEL2.0\\Facturas_check_out" + nombreArchivo;
+            
+            // Validar existencia de la ruta antes de escribir el archivo
+            File directorio = new File("Facturas_check_out");
+            if (!directorio.exists() || !directorio.isDirectory()) {
+                throw new TicketNoGeneradoException(CodigoError.ERR_GENERAR_TICKET,
+                        "La ruta para guardar la factura no existe: " + directorio.getAbsolutePath());
+            }
+            
+            String ruta = directorio.getAbsolutePath() + File.separator + "Facturas_" + nombreArchivo;
             if (correo.isEmpty() || !correo.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,6}$")) {
                 JOptionPane.showMessageDialog(this, "Correo inválido. Verifica la dirección.");
                 return;
@@ -330,6 +341,9 @@ public class check_out extends javax.swing.JFrame {
             PdfWriter.getInstance(documento, new FileOutputStream(ruta));
             documento.open();
 
+            
+            
+            
             // Logo y nombre del hotel
             Image logo = Image.getInstance(getClass().getResource("/com/images/coral.png"));
             logo.scaleAbsolute(60, 60);
