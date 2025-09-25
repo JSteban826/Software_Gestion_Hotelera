@@ -8,12 +8,15 @@ import LOGICA.ClienteNoExisteException;
 import LOGICA.CodigoError;
 import LOGICA.HistorialManager;
 import LOGICA.HistorialManagerSingleton;
-import LOGICA.Reservas;
+import IGU.Reserva;
 import static LOGICA.enviarCorreoConAdjunto.enviarCorreoConAdjunto;
 import LOGICA.CorreoNoEnviadoException;
 import LOGICA.ManejadorErrores;
+import LOGICA.PagoService;
+import LOGICA.PagoService.MetodoPago;
 import LOGICA.TicketNoGeneradoException;
-
+import LOGICA.GestionReservas;
+import LOGICA.Reservas;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
@@ -38,13 +41,13 @@ import javax.swing.JComboBox;
 import javax.swing.JTextField;
 
 public class check_out extends javax.swing.JFrame {
-    
+
     public check_out() {
-        
+
         initComponents();
-        
+
         cmb_clientes.setBorder(null);
-        
+
         setDefaultCloseOperation(check_out.DISPOSE_ON_CLOSE); //  SOLO CIERRA JFrame2
 
         cargarClientesEnComboBox();
@@ -52,33 +55,33 @@ public class check_out extends javax.swing.JFrame {
         int nuevoId = check_out.obtenerSiguienteIdCheck();
         txt_id_check.setText(String.valueOf(nuevoId)); // 
     }
-    
+
     private String serviciosSeleccionados = "";
     private int valorTotalCalculado = 0;
 
     // Asegúrate de importar IGU.Cliente
     Map<String, Cliente> datosClientes = new HashMap<>();
-    
+
     private void cargarClientesEnComboBox() {
         String sql = "SELECT Cedula, nombre, apellido, correo_electronico FROM clientes";
-        
+
         try (java.sql.Connection conn = ConexionBD.conectar(); PreparedStatement statement = conn.prepareStatement(sql); ResultSet rs = statement.executeQuery()) {
             cmb_clientes.removeAllItems();
             datosClientes.clear();
             txt_id_cliente_chk.setText("");
             txt_correo.setText("");
-            
+
             while (rs.next()) {
                 String cedula = rs.getString("Cedula");
                 String nombre = rs.getString("nombre");
                 String apellido = rs.getString("apellido");
                 String correo = rs.getString("correo_electronico");
-                
+
                 Cliente cliente = new Cliente(cedula, nombre, apellido, correo);
                 cmb_clientes.addItem(cliente.getNombreCompleto());
                 datosClientes.put(cliente.getNombreCompleto(), cliente);
             }
-            
+
         } catch (SQLException e) {
             ManejadorErrores.errorSelectSQL(e);
         }
@@ -96,10 +99,10 @@ public class check_out extends javax.swing.JFrame {
             }
         });
     }
-    
+
     public static void insertar_pago(JTextField txt_id_cliente_chk,
             JTextField txt_Valor_total) {
-        
+
         String idCliente = txt_id_cliente_chk.getText();
         int idPago = Reserva.obtenerSiguienteIdPago();
         int valor_total = Integer.parseInt(txt_Valor_total.getText());
@@ -107,14 +110,14 @@ public class check_out extends javax.swing.JFrame {
         // Opciones para el estado del pago
         String[] opcionesEstado = {"Pagada", "Pendiente", "Cancelado"};
         JComboBox<String> comboBox = new JComboBox<>(opcionesEstado);
-        
+
         int resultadoDialogo = JOptionPane.showConfirmDialog(
                 null,
                 comboBox,
                 "Seleccione el estado del pago",
                 JOptionPane.OK_CANCEL_OPTION
         );
-        
+
         if (resultadoDialogo == JOptionPane.OK_OPTION) {
             String estado = (String) comboBox.getSelectedItem();
 
@@ -128,10 +131,10 @@ public class check_out extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "No se registró el pago porque no se seleccionó un estado.");
         }
     }
-    
-    private void buscarClientePorCedula(String cedula) throws ClienteNoExisteException, SQLException  {
+
+    private void buscarClientePorCedula(String cedula) throws ClienteNoExisteException, SQLException {
         String sql = "SELECT Cedula, nombre, apellido, correo_electronico FROM clientes WHERE Cedula = ?";
-        
+
         try (Connection conn = ConexionBD.conectar(); PreparedStatement statement = conn.prepareStatement(sql)) {
             statement.setString(1, cedula);
             try (ResultSet rs = statement.executeQuery()) {
@@ -149,22 +152,22 @@ public class check_out extends javax.swing.JFrame {
 
                     // NUEVO: Mostrar días de estancia desde tabla reservas
                     mostrarDiasEstancia(cliente.getCedula());
-                    
+
                 } else {
                     throw new ClienteNoExisteException("El cliente con cédula " + cedula + " no existe en la base de datos.");
                 }
             }
-            
+
         } catch (SQLException e) {
             ManejadorErrores.errorSelectSQL(e);
         }
     }
-    
+
     private void mostrarDiasEstancia(String cedulaCliente) {
         String sql = "SELECT dias_estancia FROM reservas WHERE id_cliente = ?";
-        
+
         try (java.sql.Connection conn = ConexionBD.conectar(); PreparedStatement statement = conn.prepareStatement(sql)) {
-            
+
             statement.setString(1, cedulaCliente);
             ResultSet rs = statement.executeQuery(); // Solo UNA VEZ
 
@@ -174,12 +177,12 @@ public class check_out extends javax.swing.JFrame {
             } else {
                 txt_dias.setText("0");
             }
-            
+
         } catch (SQLException e) {
             ManejadorErrores.errorSelectSQL(e);
         }
     }
-    
+
     private void inicializarListeners() {
         chk_minibar.addActionListener(e -> actualizarServicios());
         chk_restaurante.addActionListener(e -> actualizarServicios());
@@ -190,41 +193,41 @@ public class check_out extends javax.swing.JFrame {
 // Este método actualiza el JTextArea según las casillas marcadas
     private void actualizarServicios() {
         StringBuilder servicios = new StringBuilder();
-        
+
         if (chk_minibar.isSelected()) {
             servicios.append("Minibar activado\n");
         }
-        
+
         if (chk_restaurante.isSelected()) {
             servicios.append("Restaurante activado\n");
         }
-        
+
         if (chk_spa.isSelected()) {
             servicios.append("Spa activado\n");
         }
-        
+
         if (chk_habitacion.isSelected()) {
             servicios.append("Daño a la Habitacion activado\n");
         }
-        
+
         txt_Servicios.setText(servicios.toString());
     }
-    
+
     public static void insertarCheckOut(int idCheck, String idCliente, String correo, String serviciosAdicionales, double valorTotal, int dias) {
         String sql = "INSERT INTO check_out (id_check_out, id_cliente, correo, servicios_adicionales, valor_total, dias_estancia) VALUES (?, ?, ?, ?, ?, ?)";
-        
+
         try (java.sql.Connection conn = ConexionBD.conectar(); PreparedStatement statement = conn.prepareStatement(sql)) {
-            
+
             statement.setInt(1, idCheck);
             statement.setString(2, idCliente);
             statement.setString(3, correo);
             statement.setString(4, serviciosAdicionales);
             statement.setDouble(5, valorTotal);
             statement.setInt(6, dias);
-            
+
             statement.executeUpdate();
             JOptionPane.showMessageDialog(null, "Check-Out registrado correctamente.");
-            
+
         } catch (SQLIntegrityConstraintViolationException e) {
             ManejadorErrores.valorDuplicado(e);
         } catch (SQLTransactionRollbackException e) {
@@ -237,7 +240,7 @@ public class check_out extends javax.swing.JFrame {
             ManejadorErrores.errorDesconocido(e);
         }
     }
-    
+
     public void limpiarCampos() {
         cmb_clientes.setSelectedIndex(0); // Reinicia el ComboBox
         txt_id_cliente_chk.setText("");
@@ -256,7 +259,7 @@ public class check_out extends javax.swing.JFrame {
         txt_id_check.setText(String.valueOf(siguienteId)); // lo asignas aquí
 
     }
-    
+
     private void calcularServiciosSeleccionados() {
         int total = 0;
 
@@ -268,7 +271,7 @@ public class check_out extends javax.swing.JFrame {
 
         // Construir string de servicios seleccionados
         StringBuilder servicios = new StringBuilder();
-        
+
         if (chk_minibar.isSelected()) {
             total += precioMinibar;
             servicios.append("Minibar, ");
@@ -293,14 +296,14 @@ public class check_out extends javax.swing.JFrame {
         serviciosSeleccionados = servicios.toString();
         valorTotalCalculado = total;
     }
-    
+
     public static int obtenerSiguienteIdCheck() {
         int siguienteId = 1; // Valor por defecto si no hay registros
 
         String sql = "SELECT MAX(id_check_out) FROM check_out"; // Consulta para obtener el último id_reserva
 
         try (java.sql.Connection conn = ConexionBD.conectar(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
-            
+
             if (rs.next()) {
                 siguienteId = rs.getInt(1) + 1; // Sumamos 1 al último id
 
@@ -308,13 +311,13 @@ public class check_out extends javax.swing.JFrame {
         } catch (SQLException e) {
             ManejadorErrores.errorSelectSQL(e);
         }
-        
+
         return siguienteId;
     }
-    
+
     public void generarFacturaPDF() {
         Document documento = new Document();
-        
+
         try {
             String nombreCliente = cmb_clientes.getSelectedItem().toString();
             String idCliente = txt_id_cliente_chk.getText();
@@ -322,17 +325,17 @@ public class check_out extends javax.swing.JFrame {
             String idCheck = txt_id_check.getText();
             String diasEstancia = txt_dias.getText();
             String valorTotal = txt_Valor_total.getText();
-            
+
             String fechaActual = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
             String nombreArchivo = "factura_check_out_" + idCliente + "_" + fechaActual + ".pdf";
-            
+
             // Validar existencia de la ruta antes de escribir el archivo
             File directorio = new File("Facturas_check_out");
             if (!directorio.exists() || !directorio.isDirectory()) {
                 throw new TicketNoGeneradoException(CodigoError.ERR_GENERAR_TICKET,
                         "La ruta para guardar la factura no existe: " + directorio.getAbsolutePath());
             }
-            
+
             String ruta = directorio.getAbsolutePath() + File.separator + "Facturas_" + nombreArchivo;
             if (correo.isEmpty() || !correo.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,6}$")) {
                 JOptionPane.showMessageDialog(this, "Correo inválido. Verifica la dirección.");
@@ -341,44 +344,41 @@ public class check_out extends javax.swing.JFrame {
             PdfWriter.getInstance(documento, new FileOutputStream(ruta));
             documento.open();
 
-            
-            
-            
             // Logo y nombre del hotel
             Image logo = Image.getInstance(getClass().getResource("/com/images/coral.png"));
             logo.scaleAbsolute(60, 60);
-            
+
             PdfPTable tablaEncabezado = new PdfPTable(2);
             tablaEncabezado.setWidthPercentage(100);
-            
+
             PdfPCell celdaNombre = new PdfPCell(new Phrase("Resort Bahía Coral", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16, BaseColor.BLACK)));
             celdaNombre.setBorder(Rectangle.NO_BORDER);
             celdaNombre.setVerticalAlignment(Element.ALIGN_MIDDLE);
             celdaNombre.setHorizontalAlignment(Element.ALIGN_LEFT);
-            
+
             PdfPCell celdaLogo = new PdfPCell(logo);
             celdaLogo.setBorder(Rectangle.NO_BORDER);
             celdaLogo.setHorizontalAlignment(Element.ALIGN_RIGHT);
-            
+
             tablaEncabezado.addCell(celdaNombre);
             tablaEncabezado.addCell(celdaLogo);
-            
+
             documento.add(tablaEncabezado);
-            
+
             documento.add(Chunk.NEWLINE);
 
             // TÍTULO GRANDE (Nombre de la Factura)
             Paragraph subtitulo = new Paragraph("N°Ticket:/" + idCliente + "/" + fechaActual + "/", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 20, BaseColor.DARK_GRAY));
             subtitulo.setAlignment(Element.ALIGN_RIGHT);
             documento.add(subtitulo);
-            
+
             documento.add(Chunk.NEWLINE);
 
             // TÍTULO GRANDE (Nombre de la Factura)
             Paragraph titulo = new Paragraph("Ticket de Check Out", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 20, BaseColor.DARK_GRAY));
             titulo.setAlignment(Element.ALIGN_CENTER);
             documento.add(titulo);
-            
+
             documento.add(Chunk.NEWLINE);
 
             // Tabla de información del cliente (ahora bonita)
@@ -399,12 +399,12 @@ public class check_out extends javax.swing.JFrame {
             celdaDato.setBackgroundColor(BaseColor.DARK_GRAY);
             celdaDato.setHorizontalAlignment(Element.ALIGN_CENTER);
             celdaDato.setPadding(10);
-            
+
             PdfPCell celdaInformacion = new PdfPCell(new Phrase("Información", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.WHITE)));
             celdaInformacion.setBackgroundColor(BaseColor.DARK_GRAY);
             celdaInformacion.setHorizontalAlignment(Element.ALIGN_CENTER);
             celdaInformacion.setPadding(10);
-            
+
             tablaCliente.addCell(celdaDato);
             tablaCliente.addCell(celdaInformacion);
 
@@ -419,7 +419,7 @@ public class check_out extends javax.swing.JFrame {
             tablaCliente.addCell(getCeldaValorTabla(idCheck));
             tablaCliente.addCell(getCeldaServicioTabla("Días de estancia:"));
             tablaCliente.addCell(getCeldaValorTabla(diasEstancia));
-            
+
             documento.add(tablaCliente);
 
             // Tabla de servicios adicionales y total
@@ -440,18 +440,18 @@ public class check_out extends javax.swing.JFrame {
             celdaServicio.setBackgroundColor(BaseColor.DARK_GRAY);
             celdaServicio.setHorizontalAlignment(Element.ALIGN_CENTER);
             celdaServicio.setPadding(10);
-            
+
             PdfPCell celdaPrecio = new PdfPCell(new Phrase("Valor", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.WHITE)));
             celdaPrecio.setBackgroundColor(BaseColor.DARK_GRAY);
             celdaPrecio.setHorizontalAlignment(Element.ALIGN_CENTER);
             celdaPrecio.setPadding(10);
-            
+
             tablaServicios.addCell(celdaServicio);
             tablaServicios.addCell(celdaPrecio);
 
             // Agregar servicios seleccionados
             boolean hayServicios = false;
-            
+
             if (chk_minibar.isSelected()) {
                 tablaServicios.addCell(getCeldaServicioTabla("Minibar"));
                 tablaServicios.addCell(getCeldaValorTabla("$15000")); // Puedes poner el valor real
@@ -485,29 +485,29 @@ public class check_out extends javax.swing.JFrame {
             celdaTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
             celdaTotal.setPaddingTop(10);
             celdaTotal.setBorderWidthTop(2f);
-            
+
             PdfPCell celdaValorTotal = new PdfPCell(new Phrase("$" + valorTotal, FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14)));
             celdaValorTotal.setHorizontalAlignment(Element.ALIGN_CENTER);
             celdaValorTotal.setPaddingTop(10);
             celdaValorTotal.setBorderWidthTop(2f);
-            
+
             tablaServicios.addCell(celdaTotal);
             tablaServicios.addCell(celdaValorTotal);
-            
+
             documento.add(tablaServicios);
-            
+
             documento.close();
             String asunto = "Ticket Check-Out Hotel";
             String cuerpo = "Adjunto encontrará su ticket correspondiente a su estadía. ¡Gracias por elegirnos!";
             enviarCorreoConAdjunto(correo, asunto, cuerpo, ruta);
-            
+
             JOptionPane.showMessageDialog(null, "Ticket generada con éxito.");
             JOptionPane.showMessageDialog(null, "Ticket guardada en:\n" + ruta);
-            
+
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Error al generar PDF: " + e.getMessage());
         }
-        
+
     }
 
 // Métodos auxiliares
@@ -517,28 +517,28 @@ public class check_out extends javax.swing.JFrame {
         celda.setHorizontalAlignment(Element.ALIGN_LEFT);
         return celda;
     }
-    
+
     private PdfPCell getCeldaValor(String texto) {
         PdfPCell celda = new PdfPCell(new Phrase(texto, FontFactory.getFont(FontFactory.HELVETICA, 12)));
         celda.setBorder(Rectangle.NO_BORDER);
         celda.setHorizontalAlignment(Element.ALIGN_LEFT);
         return celda;
     }
-    
+
     private PdfPCell getCeldaServicioTabla(String texto) {
         PdfPCell celda = new PdfPCell(new Phrase(texto, FontFactory.getFont(FontFactory.HELVETICA, 12)));
         celda.setHorizontalAlignment(Element.ALIGN_CENTER);
         celda.setPadding(5);
         return celda;
     }
-    
+
     private PdfPCell getCeldaValorTabla(String texto) {
         PdfPCell celda = new PdfPCell(new Phrase(texto, FontFactory.getFont(FontFactory.HELVETICA, 12)));
         celda.setHorizontalAlignment(Element.ALIGN_CENTER);
         celda.setPadding(5);
         return celda;
     }
-    
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -571,6 +571,8 @@ public class check_out extends javax.swing.JFrame {
         btn_adicionar1 = new javax.swing.JButton();
         btn_refrescar1 = new javax.swing.JButton();
         lb_buscar = new javax.swing.JLabel();
+        jLabel14 = new javax.swing.JLabel();
+        cmb_pagos = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -721,6 +723,19 @@ public class check_out extends javax.swing.JFrame {
             }
         });
 
+        jLabel14.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
+        jLabel14.setForeground(new java.awt.Color(65, 104, 163));
+        jLabel14.setText("Metodo de Pago");
+
+        cmb_pagos.setBackground(new java.awt.Color(204, 204, 204));
+        cmb_pagos.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Transacción", "Efectivo" }));
+        cmb_pagos.setBorder(null);
+        cmb_pagos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmb_pagosActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -728,54 +743,63 @@ public class check_out extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(63, 63, 63)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(25, 25, 25)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(cmb_clientes, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(txt_id_cliente_chk, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(12, 12, 12)
-                                .addComponent(lb_buscar))
-                            .addComponent(txt_correo, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(26, 26, 26)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(chk_minibar)
-                            .addComponent(chk_restaurante)
-                            .addComponent(chk_spa)
-                            .addComponent(chk_habitacion))
-                        .addGap(18, 18, 18)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(32, 32, 32)
+                                .addComponent(btn_adicionar1, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(36, 36, 36)
+                                .addComponent(btn_refrescar1, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(103, 103, 103)
+                                .addComponent(btn_factura)
+                                .addGap(44, 44, 44))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel14)
+                                .addGap(38, 38, 38)))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(cmb_pagos, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btn_pago, javax.swing.GroupLayout.DEFAULT_SIZE, 114, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(63, 63, 63)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel8))
-                        .addGap(6, 6, 6)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txt_id_check, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txt_dias, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(147, 147, 147)
-                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(60, 60, 60)
-                        .addComponent(txt_Valor_total, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(32, 32, 32)
-                        .addComponent(btn_calcular))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(32, 32, 32)
-                        .addComponent(btn_adicionar1, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(36, 36, 36)
-                        .addComponent(btn_refrescar1, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(103, 103, 103)
-                        .addComponent(btn_factura)
-                        .addGap(44, 44, 44)
-                        .addComponent(btn_pago, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel3)
+                                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(25, 25, 25)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(cmb_clientes, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(txt_id_cliente_chk, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(12, 12, 12)
+                                        .addComponent(lb_buscar))
+                                    .addComponent(txt_correo, javax.swing.GroupLayout.PREFERRED_SIZE, 192, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(26, 26, 26)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(chk_minibar)
+                                    .addComponent(chk_restaurante)
+                                    .addComponent(chk_spa)
+                                    .addComponent(chk_habitacion))
+                                .addGap(18, 18, 18)
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel8))
+                                .addGap(6, 6, 6)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txt_id_check, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(txt_dias, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(147, 147, 147)
+                                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(60, 60, 60)
+                                .addComponent(txt_Valor_total, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(32, 32, 32)
+                                .addComponent(btn_calcular)))))
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -836,7 +860,11 @@ public class check_out extends javax.swing.JFrame {
                         .addGap(36, 36, 36)
                         .addComponent(btn_refrescar1, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(36, 36, 36)
+                        .addGap(4, 4, 4)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(cmb_pagos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel14))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(btn_factura)
                             .addComponent(btn_pago)))
@@ -890,7 +918,7 @@ public class check_out extends javax.swing.JFrame {
     }//GEN-LAST:event_txt_Valor_totalActionPerformed
 
     private void chk_minibarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chk_minibarActionPerformed
-        
+
 
     }//GEN-LAST:event_chk_minibarActionPerformed
 
@@ -902,47 +930,23 @@ public class check_out extends javax.swing.JFrame {
 
     private void btn_pagoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_pagoActionPerformed
         // TODO add your handling code here:
-        try {
-            String correo = txt_correo.getText();
-            int totalCOP = Integer.parseInt(txt_Valor_total.getText());
-            
-            double tasaCambio = 4300.0;
-            double totalUSD = totalCOP / tasaCambio;
-            String montoUSD = String.format(Locale.US, "%.2f", totalUSD);
+        Reserva reservas = new Reserva();
+        String nombre = reservas.obtenerNombreCliente(txt_id_cliente_chk.getText());
 
-            // Enviar el correo con el enlace
-            try {
-                CorreoPago.enviarCorreo(correo, montoUSD);
-                JOptionPane.showMessageDialog(this,
-                        "Correo enviado con el enlace de pago en dólares.",
-                        "Correo Enviado", JOptionPane.INFORMATION_MESSAGE);
-            } catch (CorreoNoEnviadoException e) {
-                ManejadorErrores.enviarEnlace(e);
-                JOptionPane.showMessageDialog(this,
-                        "No se pudo enviar el correo: " + e.getMessage(),
-                        "Error de Correo", JOptionPane.ERROR_MESSAGE);
-                return; // Salimos del flujo si no se pudo enviar el correo
-            }
+        String correo = txt_correo.getText();
+        double totalCOP = Double.parseDouble(txt_Valor_total.getText());
 
-            // Registrar en el historial
-            String nombre = (String) cmb_clientes.getSelectedItem();
-            HistorialManager historial_acciones = HistorialManagerSingleton.getInstancia();
-            historial_acciones.registrarAccion("Pago del cliente: " + nombre + " enviado al correo");
+        String opcion = cmb_pagos.getSelectedItem().toString();
+        MetodoPago metodo = opcion.equals("Transacción") ? MetodoPago.TRANSACCION : MetodoPago.EFECTIVO;
 
-            // Insertar el pago
-            insertar_pago(txt_id_cliente_chk, txt_Valor_total);
-            
-        } catch (NumberFormatException e) {
-            ManejadorErrores.conversion(e);
-            JOptionPane.showMessageDialog(this,
-                    "El valor total debe ser un número válido.",
-                    "Error de Formato", JOptionPane.ERROR_MESSAGE);
-        } catch (Exception e) {
-            ManejadorErrores.errorDesconocido(e);
-            JOptionPane.showMessageDialog(this,
-                    "Ocurrió un error inesperado: " + e.getMessage(),
-                    "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        PagoService.procesarPago(
+                metodo,
+                correo,
+                totalCOP,
+                nombre,
+                () -> insertar_pago(txt_id_cliente_chk, txt_Valor_total)
+        );
+
 
     }//GEN-LAST:event_btn_pagoActionPerformed
 
@@ -957,7 +961,7 @@ public class check_out extends javax.swing.JFrame {
     private void btn_facturaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_facturaActionPerformed
         // TODO add your handling code here:
         generarFacturaPDF();
-        
+
         String nombre = (String) cmb_clientes.getSelectedItem();
 
         //Agregar Accion a Historial
@@ -975,7 +979,7 @@ public class check_out extends javax.swing.JFrame {
                     || txt_correo.getText().trim().isEmpty()
                     || serviciosSeleccionados == null || serviciosSeleccionados.trim().isEmpty()
                     || txt_dias.getText().trim().isEmpty()) {
-                
+
                 throw new NullPointerException("Campos vacíos");
             }
 
@@ -986,22 +990,22 @@ public class check_out extends javax.swing.JFrame {
             String servicios = serviciosSeleccionados.trim(); // desde el cálculo
             double total = valorTotalCalculado;
             int dias = Integer.parseInt(txt_dias.getText().trim());
-            
+
             insertarCheckOut(idCheck, idCliente, correo, servicios, total, dias);
-            
+
             String nombre = (String) cmb_clientes.getSelectedItem();
 
             //Agregar Acción a Historial
             HistorialManager historial_acciones = HistorialManagerSingleton.getInstancia();
             historial_acciones.registrarAccion("Salida del cliente: " + nombre + " del hotel");
-            
+
         } catch (NullPointerException e) {
             ManejadorErrores.camposVacios(e); // Manejador de errores para campos vacíos
 
         } catch (NumberFormatException e) {
             ManejadorErrores.conversion(e);
         }
-        
+
 
     }//GEN-LAST:event_btn_adicionar1ActionPerformed
 
@@ -1030,13 +1034,17 @@ public class check_out extends javax.swing.JFrame {
             ManejadorErrores.camposVacios(e); // Manejador de errores para campos vacíos
 
         } catch (ClienteNoExisteException ex) {
-           ManejadorErrores.clienteNoExiste(ex);
+            ManejadorErrores.clienteNoExiste(ex);
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "Error al buscar el cliente en la base de datos.");
             Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, "Error SQL al buscar cliente", ex);
         }
 
     }//GEN-LAST:event_lb_buscarMouseClicked
+
+    private void cmb_pagosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmb_pagosActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cmb_pagosActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1084,7 +1092,9 @@ public class check_out extends javax.swing.JFrame {
     private javax.swing.JCheckBox chk_restaurante;
     private javax.swing.JCheckBox chk_spa;
     private javax.swing.JComboBox<String> cmb_clientes;
+    private javax.swing.JComboBox<String> cmb_pagos;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;

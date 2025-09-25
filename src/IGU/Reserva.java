@@ -13,6 +13,8 @@ import LOGICA.Habitaciones1;
 import LOGICA.GestionReservas;
 import LOGICA.ManejadorErrores;
 import LOGICA.PagoFallidoException;
+import LOGICA.PagoService;
+import LOGICA.PagoService.MetodoPago;
 import static LOGICA.enviarCorreoConAdjunto.enviarCorreoConAdjunto;
 import LOGICA.Tablas;
 import PERSISTENCIA.ConexionBD;
@@ -606,6 +608,8 @@ public class Reserva extends javax.swing.JFrame {
         jLabel14 = new javax.swing.JLabel();
         jLabel15 = new javax.swing.JLabel();
         jLabel16 = new javax.swing.JLabel();
+        cmb_pagos = new javax.swing.JComboBox<>();
+        jLabel17 = new javax.swing.JLabel();
 
         jLabel8.setText("jLabel8");
 
@@ -644,7 +648,7 @@ public class Reserva extends javax.swing.JFrame {
                 btn_reservarActionPerformed(evt);
             }
         });
-        jPanel1.add(btn_reservar, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 210, -1, -1));
+        jPanel1.add(btn_reservar, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 250, -1, -1));
 
         jLabel2.setBackground(new java.awt.Color(65, 104, 163));
         jLabel2.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
@@ -655,7 +659,7 @@ public class Reserva extends javax.swing.JFrame {
         jLabel4.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(65, 104, 163));
         jLabel4.setText("Documento:");
-        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 160, 140, -1));
+        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 150, 140, -1));
 
         txt_id_cliente.setBackground(new java.awt.Color(204, 204, 204));
         txt_id_cliente.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(0, 0, 0)));
@@ -664,7 +668,7 @@ public class Reserva extends javax.swing.JFrame {
                 txt_id_clienteActionPerformed(evt);
             }
         });
-        jPanel1.add(txt_id_cliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 160, 110, -1));
+        jPanel1.add(txt_id_cliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 150, 110, -1));
 
         txt_id_reserva.setBackground(new java.awt.Color(204, 204, 204));
         txt_id_reserva.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(0, 0, 0)));
@@ -684,11 +688,11 @@ public class Reserva extends javax.swing.JFrame {
         jLabel5.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(65, 104, 163));
         jLabel5.setText("Id Habitación:");
-        jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(97, 203, -1, -1));
+        jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 190, -1, -1));
 
         txt_id_habitacion.setBackground(new java.awt.Color(204, 204, 204));
         txt_id_habitacion.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(0, 0, 0)));
-        jPanel1.add(txt_id_habitacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(241, 205, 110, -1));
+        jPanel1.add(txt_id_habitacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 190, 110, -1));
 
         jtable_reservas.setFont(new java.awt.Font("Microsoft YaHei UI", 0, 12)); // NOI18N
         jtable_reservas.setModel(new javax.swing.table.DefaultTableModel(
@@ -720,10 +724,10 @@ public class Reserva extends javax.swing.JFrame {
         jPanel1.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 304, 669, 253));
 
         jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/images/licencia-de-conducir.png"))); // NOI18N
-        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 160, 40, 20));
+        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 150, 40, 20));
 
         jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/images/habitacion-disponible.png"))); // NOI18N
-        jPanel1.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 230, -1, 30));
+        jPanel1.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 220, -1, 30));
 
         jLabel10.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/images/calendario (3).png"))); // NOI18N
         jPanel1.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(467, 152, 37, -1));
@@ -746,7 +750,7 @@ public class Reserva extends javax.swing.JFrame {
                 cmb_habitacionesActionPerformed(evt);
             }
         });
-        jPanel1.add(cmb_habitaciones, new org.netbeans.lib.awtextra.AbsoluteConstraints(241, 245, 140, -1));
+        jPanel1.add(cmb_habitaciones, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 230, 140, -1));
 
         btn_actualizar.setBackground(new java.awt.Color(65, 104, 163));
         btn_actualizar.setFont(new java.awt.Font("Georgia", 1, 12)); // NOI18N
@@ -794,7 +798,7 @@ public class Reserva extends javax.swing.JFrame {
                 btn_pagoActionPerformed(evt);
             }
         });
-        jPanel1.add(btn_pago, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 210, 120, -1));
+        jPanel1.add(btn_pago, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 250, 120, -1));
 
         jPanel2.setBackground(new java.awt.Color(65, 104, 163));
 
@@ -826,8 +830,8 @@ public class Reserva extends javax.swing.JFrame {
 
         jLabel14.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
         jLabel14.setForeground(new java.awt.Color(65, 104, 163));
-        jLabel14.setText("Habitación:");
-        jPanel1.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(97, 246, -1, -1));
+        jLabel14.setText("Metodo de Pago");
+        jPanel1.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 210, -1, -1));
 
         jLabel15.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
         jLabel15.setForeground(new java.awt.Color(65, 104, 163));
@@ -835,7 +839,22 @@ public class Reserva extends javax.swing.JFrame {
         jPanel1.add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 110, -1, -1));
 
         jLabel16.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/images/habitacion-disponible.png"))); // NOI18N
-        jPanel1.add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 192, -1, 30));
+        jPanel1.add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 180, -1, 30));
+
+        cmb_pagos.setBackground(new java.awt.Color(204, 204, 204));
+        cmb_pagos.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Transacción", "Efectivo" }));
+        cmb_pagos.setBorder(null);
+        cmb_pagos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmb_pagosActionPerformed(evt);
+            }
+        });
+        jPanel1.add(cmb_pagos, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 210, 140, -1));
+
+        jLabel17.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
+        jLabel17.setForeground(new java.awt.Color(65, 104, 163));
+        jLabel17.setText("Habitación:");
+        jPanel1.add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 230, -1, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -915,10 +934,6 @@ public class Reserva extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txt_id_clienteActionPerformed
 
-    private void cmb_habitacionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmb_habitacionesActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_cmb_habitacionesActionPerformed
-
     private void btn_adicionar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_adicionar1ActionPerformed
         // TODO add your handling code here:
 
@@ -966,38 +981,38 @@ public class Reserva extends javax.swing.JFrame {
 
     private void btn_pagoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_pagoActionPerformed
         // TODO add your handling code here:
-        try {
-            GestionReservas gestion = new GestionReservas();
-            gestion.capturarDatosYRealizarPago(txt_id_cliente, txt_id_reserva);
+        GestionReservas gestion = new GestionReservas();
+        String correo = gestion.obtenerCorreoCliente(Integer.parseInt(txt_id_cliente.getText()));
+        double totalCOP = gestion.obtenerMontoReserva(Integer.parseInt(txt_id_reserva.getText()));
 
-            String cedula = txt_id_cliente.getText();
-            String nombre = obtenerNombreCliente(cedula);
+        String nombre = obtenerNombreCliente(txt_id_cliente.getText());
 
-            HistorialManager historial_acciones = HistorialManagerSingleton.getInstancia();
-            historial_acciones.registrarAccion("Pago del cliente: " + nombre + " enviado al correo");
+        String opcion = cmb_pagos.getSelectedItem().toString();
+        MetodoPago metodo = opcion.equals("Transacción") ? MetodoPago.TRANSACCION : MetodoPago.EFECTIVO;
 
-            insertar_pago(txt_id_habitacion, txt_id_cliente, jdate_fecha_entrada, jdate_fecha_salida);
-
-        } catch (CorreoNoEnviadoException e) {
-            ManejadorErrores.enviarEnlace(e);
-            JOptionPane.showMessageDialog(null,
-                    "No se pudo enviar el correo al cliente: " + e.getMessage(),
-                    "Error de Correo", JOptionPane.ERROR_MESSAGE);
-
-        } catch (PagoFallidoException e) {
-            ManejadorErrores.errorPago(e);
-            JOptionPane.showMessageDialog(null,
-                    "Error al procesar el pago: " + e.getMessage(),
-                    "Error de Pago", JOptionPane.ERROR_MESSAGE);
-
-        } catch (Exception e) {
-            ManejadorErrores.errorDesconocido(e);
-            JOptionPane.showMessageDialog(null,
-                    "Error inesperado: " + e.getMessage(),
-                    "Error", JOptionPane.ERROR_MESSAGE);
+        PagoService.procesarPago(
+                metodo,
+                correo,
+                totalCOP,
+                nombre,
+                () -> {
+            try {
+                insertar_pago(txt_id_habitacion, txt_id_cliente, jdate_fecha_entrada, jdate_fecha_salida);
+            } catch (FechasInvalidasException ex) {
+                java.util.logging.Logger.getLogger(Reserva.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
+        );
 
     }//GEN-LAST:event_btn_pagoActionPerformed
+
+    private void cmb_pagosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmb_pagosActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cmb_pagosActionPerformed
+
+    private void cmb_habitacionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmb_habitacionesActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cmb_habitacionesActionPerformed
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -1040,6 +1055,7 @@ public class Reserva extends javax.swing.JFrame {
     private javax.swing.JButton btn_refrescar1;
     private javax.swing.JButton btn_reservar;
     private javax.swing.JComboBox<String> cmb_habitaciones;
+    private javax.swing.JComboBox<String> cmb_pagos;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -1048,6 +1064,7 @@ public class Reserva extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
