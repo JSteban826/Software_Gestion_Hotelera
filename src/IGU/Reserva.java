@@ -1,10 +1,7 @@
 package IGU;
 
-import static IGU.Registro.insertarUsuario;
 import LOGICA.ClienteNoExisteException;
 import LOGICA.CodigoError;
-import LOGICA.Logger;
-import LOGICA.CorreoNoEnviadoException;
 import LOGICA.FechasInvalidasException;
 import LOGICA.ReservaManager;
 import LOGICA.HistorialManagerSingleton;
@@ -12,15 +9,13 @@ import LOGICA.HistorialManager;
 import LOGICA.Habitaciones1;
 import LOGICA.GestionReservas;
 import LOGICA.ManejadorErrores;
-import LOGICA.PagoFallidoException;
 import LOGICA.PagoService;
 import LOGICA.PagoService.MetodoPago;
-import static LOGICA.enviarCorreoConAdjunto.enviarCorreoConAdjunto;
 import LOGICA.Tablas;
 import PERSISTENCIA.ConexionBD;
 import LOGICA.Reservas;
-import LOGICA.TicketNoGeneradoException;
-
+import LOGICA.TicketPDFService;
+import LOGICA.TicketPDFService.ParametrosReserva;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.sql.Connection;
@@ -35,12 +30,6 @@ import javax.swing.JOptionPane;
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.SQLTimeoutException;
 import java.sql.SQLTransactionRollbackException;
@@ -51,6 +40,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Reserva extends javax.swing.JFrame {
 
@@ -402,150 +392,6 @@ public class Reserva extends javax.swing.JFrame {
         }
 
         return correo;
-    }
-
-    public void generarFacturaPDF() throws DocumentException, BadElementException, FileNotFoundException, IOException {
-        Document documento = new Document();
-
-        try {
-            String idreserva = txt_id_reserva.getText();
-            String idCliente = txt_id_cliente.getText();
-            String idhabitacion = txt_id_habitacion.getText();
-            Date fechaEntrada = jdate_fecha_entrada.getDate();
-            Date fechaSalida = jdate_fecha_salida.getDate();
-
-            // Validación previa
-            if (idreserva.isEmpty() || idCliente.isEmpty() || idhabitacion.isEmpty() || fechaEntrada == null || fechaSalida == null) {
-                throw new TicketNoGeneradoException(CodigoError.ERR_GENERAR_TICKET, "Datos incompletos para generar la factura. Verifica todos los campos.");
-            }
-
-            String correo = obtenerCorreoCliente(idCliente);
-
-            if (correo == null || correo.isEmpty() || !correo.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,6}$")) {
-                throw new TicketNoGeneradoException(CodigoError.ERR_GENERAR_TICKET, "Correo inválido. Verificar datos del cliente.");
-            }
-
-            SimpleDateFormat formato = new SimpleDateFormat("yyyy-MM-dd");
-            String strFechaEntrada = formato.format(fechaEntrada);
-            String strFechaSalida = formato.format(fechaSalida);
-
-            String fechaActual = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-
-            // Validar existencia de la ruta antes de escribir el archivo
-            File directorio = new File("Facturas_reservas");
-            if (!directorio.exists() || !directorio.isDirectory()) {
-                throw new TicketNoGeneradoException(CodigoError.ERR_GENERAR_TICKET,
-                        "La ruta para guardar la factura no existe: " + directorio.getAbsolutePath());
-            }
-
-            String nombreArchivo = "factura_reserva_" + idCliente + "_" + fechaActual + ".pdf";
-            String ruta = directorio.getAbsolutePath() + File.separator + "Facturas_" + nombreArchivo;
-
-            PdfWriter.getInstance(documento, new FileOutputStream(ruta));
-            documento.open();
-
-            // Logo
-            com.itextpdf.text.Image logo = com.itextpdf.text.Image.getInstance(getClass().getResource("/com/images/coral.png"));
-            logo.scaleAbsolute(60, 60);
-
-            // Encabezado
-            PdfPTable tablaEncabezado = new PdfPTable(2);
-            tablaEncabezado.setWidthPercentage(100);
-
-            PdfPCell celdaNombre = new PdfPCell(new Phrase("Resort Bahía Coral", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.BLACK)));
-            celdaNombre.setBorder(Rectangle.NO_BORDER);
-            celdaNombre.setVerticalAlignment(Element.ALIGN_MIDDLE);
-            celdaNombre.setHorizontalAlignment(Element.ALIGN_LEFT);
-
-            PdfPCell celdaLogo = new PdfPCell(logo);
-            celdaLogo.setBorder(Rectangle.NO_BORDER);
-            celdaLogo.setHorizontalAlignment(Element.ALIGN_RIGHT);
-
-            tablaEncabezado.addCell(celdaNombre);
-            tablaEncabezado.addCell(celdaLogo);
-            documento.add(tablaEncabezado);
-
-            Paragraph subtitulo = new Paragraph("N°Ticket:/" + idCliente + "/" + fechaActual + "/", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 20, BaseColor.DARK_GRAY));
-            subtitulo.setAlignment(Element.ALIGN_RIGHT);
-            documento.add(subtitulo);
-
-            documento.add(Chunk.NEWLINE);
-
-            BaseColor colorPersonalizado = new BaseColor(30, 144, 255);
-            Paragraph titulo = new Paragraph("Ticket de Reserva", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18, colorPersonalizado));
-            titulo.setAlignment(Element.ALIGN_CENTER);
-            documento.add(titulo);
-            documento.add(Chunk.NEWLINE);
-
-            PdfPTable tablaDatos = new PdfPTable(2);
-            tablaDatos.setWidthPercentage(100);
-            tablaDatos.setSpacingBefore(10f);
-
-            PdfPCell celdaTitulo = new PdfPCell(new Phrase("Datos de la Reserva", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16, BaseColor.WHITE)));
-            celdaTitulo.setColspan(2);
-            celdaTitulo.setBackgroundColor(colorPersonalizado);
-            celdaTitulo.setHorizontalAlignment(Element.ALIGN_CENTER);
-            celdaTitulo.setPadding(10);
-            tablaDatos.addCell(celdaTitulo);
-
-            PdfPCell celdaDato = new PdfPCell(new Phrase("Dato", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.WHITE)));
-            celdaDato.setBackgroundColor(BaseColor.DARK_GRAY);
-            celdaDato.setHorizontalAlignment(Element.ALIGN_CENTER);
-            celdaDato.setPadding(8);
-
-            PdfPCell celdaValor = new PdfPCell(new Phrase("Información", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.WHITE)));
-            celdaValor.setBackgroundColor(BaseColor.DARK_GRAY);
-            celdaValor.setHorizontalAlignment(Element.ALIGN_CENTER);
-            celdaValor.setPadding(8);
-
-            tablaDatos.addCell(celdaDato);
-            tablaDatos.addCell(celdaValor);
-
-            tablaDatos.addCell(getCeldaServicioTabla("ID Reserva:"));
-            tablaDatos.addCell(getCeldaValorTabla(idreserva));
-            tablaDatos.addCell(getCeldaServicioTabla("ID Cliente:"));
-            tablaDatos.addCell(getCeldaValorTabla(idCliente));
-            tablaDatos.addCell(getCeldaServicioTabla("ID Habitación:"));
-            tablaDatos.addCell(getCeldaValorTabla(idhabitacion));
-            tablaDatos.addCell(getCeldaServicioTabla("Fecha de Entrada:"));
-            tablaDatos.addCell(getCeldaValorTabla(strFechaEntrada));
-            tablaDatos.addCell(getCeldaServicioTabla("Fecha de Salida:"));
-            tablaDatos.addCell(getCeldaValorTabla(strFechaSalida));
-
-            documento.add(tablaDatos);
-            documento.close();
-
-            // Enviar correo
-            String asunto = "Ticket Reserva Hotel Bahia Resort Coral";
-            String cuerpo = "Adjunto encontrará su ticket correspondiente al pago de su reserva. ¡Gracias por elegirnos!";
-            enviarCorreoConAdjunto(correo, asunto, cuerpo, ruta);
-
-            JOptionPane.showMessageDialog(null, "Ticket generado con éxito.");
-            JOptionPane.showMessageDialog(null, "Ticket guardado en:\n" + ruta);
-
-        } catch (TicketNoGeneradoException e) {
-            Logger.registrarError(e.getCodigoError(), e);
-            JOptionPane.showMessageDialog(null, "Error al generar ticket: " + e.getMessage());
-        } catch (Exception e) {
-            // Captura cualquier otro error inesperado
-            TicketNoGeneradoException errorGeneral = new TicketNoGeneradoException(CodigoError.ERR_GENERAR_TICKET, "Error inesperado al generar la factura: " + e.getMessage());
-            Logger.registrarError(errorGeneral.getCodigoError(), errorGeneral);
-            //JOptionPane.showMessageDialog(null, "Error al generar ticket: " + errorGeneral.getMessage());
-        }
-    }
-
-    private PdfPCell getCeldaServicioTabla(String texto) {
-        PdfPCell celda = new PdfPCell(new Phrase(texto, FontFactory.getFont(FontFactory.HELVETICA, 12, BaseColor.BLACK)));
-        celda.setPadding(8);
-        celda.setHorizontalAlignment(Element.ALIGN_LEFT);
-        return celda;
-    }
-
-    private PdfPCell getCeldaValorTabla(String texto) {
-        PdfPCell celda = new PdfPCell(new Phrase(texto, FontFactory.getFont(FontFactory.HELVETICA, 12, BaseColor.BLACK)));
-        celda.setPadding(8);
-        celda.setHorizontalAlignment(Element.ALIGN_LEFT);
-        return celda;
     }
 
     public String obtenerNombreCliente(String Cedula) {
@@ -962,8 +808,15 @@ public class Reserva extends javax.swing.JFrame {
     private void btn_facturaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_facturaActionPerformed
         // TODO add your handling code here:
         try {
-            // Generar la factura en PDF
-            generarFacturaPDF();
+            ParametrosReserva pr = new ParametrosReserva();
+            pr.idReserva = txt_id_reserva.getText();
+            pr.idCliente = txt_id_cliente.getText();
+            pr.idHabitacion = txt_id_habitacion.getText();
+            pr.fechaEntrada = jdate_fecha_entrada.getDate();
+            pr.fechaSalida = jdate_fecha_salida.getDate();
+            pr.correo = obtenerCorreoCliente(pr.idCliente);
+
+            TicketPDFService.generarFacturaReserva(pr);
 
             // Obtener datos del cliente
             String cedula = txt_id_cliente.getText();
@@ -973,8 +826,8 @@ public class Reserva extends javax.swing.JFrame {
             HistorialManager historial_acciones = HistorialManagerSingleton.getInstancia();
             historial_acciones.registrarAccion("Ticket del cliente: " + nombre + " generada");
 
-        } catch (Exception ex) {
-            ex.printStackTrace(); // o manejar otras excepciones generales
+         } catch (Exception ex) {
+            Logger.getLogger(check_out.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }//GEN-LAST:event_btn_facturaActionPerformed
@@ -996,12 +849,12 @@ public class Reserva extends javax.swing.JFrame {
                 totalCOP,
                 nombre,
                 () -> {
-            try {
-                insertar_pago(txt_id_habitacion, txt_id_cliente, jdate_fecha_entrada, jdate_fecha_salida);
-            } catch (FechasInvalidasException ex) {
-                java.util.logging.Logger.getLogger(Reserva.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+                    try {
+                        insertar_pago(txt_id_habitacion, txt_id_cliente, jdate_fecha_entrada, jdate_fecha_salida);
+                    } catch (FechasInvalidasException ex) {
+                        java.util.logging.Logger.getLogger(Reserva.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
         );
 
     }//GEN-LAST:event_btn_pagoActionPerformed
