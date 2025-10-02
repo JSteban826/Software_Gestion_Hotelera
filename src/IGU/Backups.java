@@ -8,6 +8,7 @@ import LOGICA.BackupException;
 import LOGICA.CodigoError;
 import PERSISTENCIA.ConexionBD;
 import LOGICA.ManejadorErrores;
+import java.awt.Color;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -18,6 +19,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
+import javax.swing.UIManager;
 
 /**
  *
@@ -154,27 +156,43 @@ public class Backups extends javax.swing.JFrame {
 
     public void generarBackupAsync() {
         lbl_status.setText("⏳ Realizando backup, por favor espera...");
+
+        // Configuración inicial de la barra
         ProgressBar_backup.setVisible(true);
         ProgressBar_backup.setIndeterminate(false);
+        ProgressBar_backup.setMinimum(0);
+        ProgressBar_backup.setMaximum(100);
         ProgressBar_backup.setValue(0);
+
+        // Habilitar que Nimbus respete setForeground()
+        UIManager.put("ProgressBar[Enabled].foregroundPainter", null);
+        UIManager.put("ProgressBar[Enabled+Finished].foregroundPainter", null);
+        UIManager.put("ProgressBar[Enabled+Indeterminate].foregroundPainter", null);
 
         SwingWorker<Void, Integer> worker = new SwingWorker<>() {
             @Override
             protected Void doInBackground() {
-                // Simulación de progreso hasta 90%
-                for (int i = 0; i <= 90; i += 5) {
+                for (int i = 0; i <= 90; i += 10) {
                     try {
-                        Thread.sleep(5125); // medio segundo entre pasos
+                        Thread.sleep(5125);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    publish(i); // enviar avance al método process()
+
+                    if (i < 30) {
+                        UIManager.put("nimbusOrange", new Color(135, 206, 250));
+                    } else if (i < 70) {
+                        UIManager.put("nimbusOrange", new Color(100, 149, 237));
+                    } else {
+                        UIManager.put("nimbusOrange", new Color(100, 149, 237));
+                    }
+                    ProgressBar_backup.repaint(); // Forzar repintado
+
+                    publish(i);
                 }
 
-                // Aquí ejecutas tu backup real
+                // Metodo de generar backup
                 generarBackup();
-
-                // Al terminar, aseguramos 100%
                 publish(100);
                 return null;
             }
@@ -188,12 +206,11 @@ public class Backups extends javax.swing.JFrame {
             @Override
             protected void done() {
                 try {
-                    get(); // si hubo error, se lanza aquí
+                    get();
                     lbl_status.setText("Backup finalizado con éxito.");
                 } catch (Exception e) {
                     lbl_status.setText("Error durante el backup: " + e.getMessage());
                 }
-                // progressBar.setVisible(false); // si quieres ocultarla al final
             }
         };
 
@@ -250,6 +267,8 @@ public class Backups extends javax.swing.JFrame {
                 btn_refrescarActionPerformed(evt);
             }
         });
+
+        ProgressBar_backup.setForeground(new java.awt.Color(51, 153, 255));
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -370,6 +389,8 @@ public class Backups extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new Backups().setVisible(true);
+                System.out.println(UIManager.getLookAndFeel().getName());
+
             }
         });
     }
