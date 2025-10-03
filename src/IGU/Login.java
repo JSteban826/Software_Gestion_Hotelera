@@ -17,6 +17,7 @@ import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.SQLTimeoutException;
 import java.sql.SQLTransactionRollbackException;
 import java.util.logging.Level;
+import LOGICA.LoginService;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
@@ -37,81 +38,6 @@ public class Login extends javax.swing.JFrame {
     public Image getIconImage() {
         Image retValue = Toolkit.getDefaultToolkit().getImage(ClassLoader.getSystemResource("com.images/logos.jpg"));
         return retValue;
-    }
-
-    public static String validarLogin(String usuario, String contraseña) throws SQLTransactionRollbackException, SQLTimeoutException, SQLException {
-        String sql = "SELECT r.nombre AS rol FROM usuarios u JOIN roles r ON u.rol_id = r.id WHERE u.usuario = ? AND u.contraseña = ?";
-        try (Connection conn = ConexionBD.conectar(); PreparedStatement statement = conn.prepareStatement(sql)) {
-            statement.setString(1, usuario);
-            statement.setString(2, contraseña);
-            ResultSet rs = statement.executeQuery();
-
-            if (rs.next()) {
-                return rs.getString("rol");  // Ej: "Administrador" o "Recepcionista"
-            } else {
-                return null;
-            }
-        } catch (SQLTransactionRollbackException e) {
-            ManejadorErrores.tablasBloqueadas(e);
-        } catch (SQLTimeoutException e) {
-            ManejadorErrores.bloqueoTimeout(e);
-        } catch (SQLException e) {
-            ManejadorErrores.errorSelectSQL(e);
-        } catch (Exception e) {
-            ManejadorErrores.errorDesconocido(e);
-        }
-        return null;
-
-    }
-
-    public static void realizarLogin(JTextField userTxt, JPasswordField passTxt, JFrame loginFrame) throws SQLTransactionRollbackException, SQLTimeoutException, SQLException {
-        String usuario = userTxt.getText();
-        String contraseña = new String(passTxt.getPassword());
-        try {
-            // Llamada al método mejorado
-            String rol = validarLogin(usuario, contraseña);
-
-            if (rol != null) {
-                JOptionPane.showMessageDialog(null, "Acceso concedido: (" + rol + ": " + usuario + ").");
-
-                HistorialManager historial = HistorialManagerSingleton.getInstancia();
-                historial.registrarAccion("Ingreso de " + rol + ": " + usuario);
-                historial.registrarLogin(usuario, rol, true);
-
-                switch (rol.toLowerCase()) {
-                    case "administrador":
-                        Administracion admin = new Administracion();
-                        admin.setVisible(true);
-                        admin.setResizable(false);
-                        centrarVentana(admin);
-                        loginFrame.dispose(); // Cierra la ventana de login actual
-                        break;
-                    case "recepcionista":
-                        PRINCIPAL1 recepcion = new PRINCIPAL1();
-                        recepcion.setVisible(true);
-                        recepcion.setResizable(false);
-                        centrarVentana(recepcion);
-                        loginFrame.dispose(); // Cierra la ventana de login actual
-                        break;
-                    default:
-                        JOptionPane.showMessageDialog(null, "Rol no reconocido.");
-                        return;
-                }
-
-                loginFrame.dispose();
-            } else {
-                HistorialManager historial = HistorialManagerSingleton.getInstancia();
-                historial.registrarLogin(usuario, "Desconocido", false);
-                // Llamada al método accesoDenegado para registrar el error
-                accesoDenegado(new Exception("Acceso denegado por credenciales incorrectas"));
-            }
-
-        } catch (Exception e) {
-            // Llamada al método accesoDenegado para registrar cualquier excepción
-            accesoDenegado(e);
-            JOptionPane.showMessageDialog(null, "Error en el proceso de login.");
-        }
-
     }
 
     public static void centrarVentana(JFrame frame) {
@@ -364,20 +290,35 @@ public class Login extends javax.swing.JFrame {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
 
-        String usuario = userTxt.getText();
-        String contraseña = passTxt.getText();
-        try {
-            if (usuario.isEmpty() || contraseña.isEmpty()) {
-                throw new NullPointerException("Campos vacíos");
-            }
+    String usuario = userTxt.getText().trim();
+    String contraseña = new String(passTxt.getPassword());
 
-            realizarLogin(userTxt, passTxt, this);
+    LoginService loginService = new LoginService();
+    String rol = loginService.realizarLogin(usuario, contraseña);
 
-        } catch (NullPointerException e) {
-            ManejadorErrores.camposVacios(e);
-        } catch (SQLException ex) {
-            java.util.logging.Logger.getLogger(Registro.class.getName()).log(Level.SEVERE, null, ex);
+    if (rol != null) {
+        JOptionPane.showMessageDialog(null, "Acceso concedido: (" + rol + ": " + usuario + ").");
+
+        switch (rol.toLowerCase()) {
+            case "administrador":
+                Administracion admin = new Administracion();
+                centrarVentana(admin);
+                admin.setVisible(true);
+                break;
+            case "recepcionista":
+                PRINCIPAL1 recepcion = new PRINCIPAL1();
+                centrarVentana(recepcion);
+                recepcion.setVisible(true);
+                break;
+            default:
+                JOptionPane.showMessageDialog(null, "Rol no reconocido.");
+                break;
         }
+
+        this.dispose();
+    } else {
+        JOptionPane.showMessageDialog(null, "Acceso denegado. Verifique credenciales.");
+    }
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
