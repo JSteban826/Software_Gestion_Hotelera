@@ -5,14 +5,16 @@
 package IGU;
 
 import LOGICA.BackupException;
-import LOGICA.CodigoError;
 import PERSISTENCIA.ConexionBD;
 import LOGICA.ManejadorErrores;
 import java.awt.Color;
 import java.awt.Desktop;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
@@ -61,10 +63,10 @@ public class Backups extends javax.swing.JFrame {
                             Desktop.getDesktop().open(archivoSeleccionado);
                         } catch (FileNotFoundException fnf) {
                             ManejadorErrores.rutaarchivo(fnf);
-                            JOptionPane.showMessageDialog(null, "❌ El archivo no existe o fue movido.");
+                            JOptionPane.showMessageDialog(null, "El archivo no existe o fue movido.");
                         } catch (IOException io) {
                             ManejadorErrores.abrirarchivo(io);
-                            JOptionPane.showMessageDialog(null, "❌ No se pudo abrir el archivo.");
+                            JOptionPane.showMessageDialog(null, " No se pudo abrir el archivo.");
                         }
                     }
                 }
@@ -73,9 +75,7 @@ public class Backups extends javax.swing.JFrame {
     }
 
     public void generarBackup() {
-
         try {
-
             // Crear carpeta de backups si no existe
             File carpetaBackups = new File("BackupsHotel");
             if (!carpetaBackups.exists()) {
@@ -100,8 +100,9 @@ public class Backups extends javax.swing.JFrame {
                         "-p" + ConexionBD.CONTRASEÑA,
                         "hotel"
                 );
-                pb.redirectOutput(new File(rutaBackup));
-                pb.redirectErrorStream(true);
+
+                pb.redirectOutput(new File(rutaBackup)); // salida al archivo .sql
+                pb.redirectError(ProcessBuilder.Redirect.INHERIT); // errores a la consola
 
                 Process proceso = pb.start();
                 int resultado = proceso.waitFor();
@@ -110,7 +111,7 @@ public class Backups extends javax.swing.JFrame {
                     throw new IOException("mysqldump no encontrado en PATH");
                 }
 
-                lbl_status.setText("Backup realizado con éxito");
+                lbl_status.setText("✅ Backup realizado con éxito");
 
             } catch (IOException e1) {
                 // --- 2. Si falla, intentar con ruta absoluta ---
@@ -121,16 +122,17 @@ public class Backups extends javax.swing.JFrame {
                         "-p" + ConexionBD.CONTRASEÑA,
                         "hotel"
                 );
+
                 pb.redirectOutput(new File(rutaBackup));
-                pb.redirectErrorStream(true);
+                pb.redirectError(ProcessBuilder.Redirect.INHERIT);
 
                 Process proceso = pb.start();
                 int resultado = proceso.waitFor();
 
                 if (resultado == 0) {
-                    lbl_status.setText("Backup realizado con éxito");
+                    lbl_status.setText("✅ Backup realizado con éxito");
                 } else {
-                    lbl_status.setText("Error al realizar el backup. Código: " + resultado);
+                    lbl_status.setText("❌ Error al realizar el backup. Código: " + resultado);
                     throw new BackupException("Error al generar backup con ruta absoluta");
                 }
             }
@@ -217,6 +219,68 @@ public class Backups extends javax.swing.JFrame {
         worker.execute();
     }
 
+    private void restaurarBackup(String nombreBackup) {
+        SwingWorker<Void, String> worker = new SwingWorker<Void, String>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                publish("⏳ Espera, restauración de copia de seguridad en curso...");
+
+                try {
+                    String rutaMysql = "C:\\Program Files\\MySQL\\MySQL Server 8.0\\bin\\mysql.exe";
+
+                    // Carpeta de backups
+                    File carpetaBackups = new File("BackupsHotel");
+
+                    // Archivo dentro de la carpeta
+                    File archivoBackup = new File(carpetaBackups, nombreBackup);
+
+                    if (!archivoBackup.exists()) {
+                        publish("⚠️ Error: No se encontró el archivo " + archivoBackup.getAbsolutePath());
+                        return null;
+                    }
+
+                    ProcessBuilder pb = new ProcessBuilder(
+                            rutaMysql,
+                            "-h", "database-hotel.mysql.database.azure.com",
+                            "-u", ConexionBD.USUARIO,
+                            "-p" + ConexionBD.CONTRASEÑA,
+                            "hotel"
+                    );
+
+                    pb.redirectInput(archivoBackup);
+                    pb.redirectErrorStream(true);
+
+                    Process proceso = pb.start();
+
+                    BufferedReader br = new BufferedReader(new InputStreamReader(proceso.getInputStream()));
+                    String linea;
+                    while ((linea = br.readLine()) != null) {
+                        System.out.println(linea);
+                    }
+
+                    int exitCode = proceso.waitFor();
+                    if (exitCode == 0) {
+                        publish("✅ Restauración finalizada con éxito");
+                    } else {
+                        publish("❌ Error en la restauración");
+                    }
+
+                } catch (Exception e) {
+                    publish("⚠️ Error: " + e.getMessage());
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void process(java.util.List<String> chunks) {
+                lbl_status2.setText(chunks.get(chunks.size() - 1));
+            }
+        };
+
+        worker.execute();
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -235,6 +299,7 @@ public class Backups extends javax.swing.JFrame {
         lbl_status = new javax.swing.JLabel();
         btn_refrescar = new javax.swing.JButton();
         ProgressBar_backup = new javax.swing.JProgressBar();
+        lbl_status2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -270,6 +335,8 @@ public class Backups extends javax.swing.JFrame {
 
         ProgressBar_backup.setForeground(new java.awt.Color(51, 153, 255));
 
+        lbl_status2.setText("Presione para Restaurar la copia de seguridad");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -285,7 +352,9 @@ public class Backups extends javax.swing.JFrame {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(btn_refrescar)
                         .addGap(18, 18, 18)
-                        .addComponent(btn_restaurar))
+                        .addComponent(btn_restaurar)
+                        .addGap(18, 18, 18)
+                        .addComponent(lbl_status2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(btn_generar)
                         .addGap(31, 31, 31)
@@ -312,7 +381,8 @@ public class Backups extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btn_refrescar)
-                    .addComponent(btn_restaurar))
+                    .addComponent(btn_restaurar)
+                    .addComponent(lbl_status2, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(117, Short.MAX_VALUE))
         );
 
@@ -322,8 +392,8 @@ public class Backups extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -338,6 +408,21 @@ public class Backups extends javax.swing.JFrame {
 
     private void btn_restaurarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_restaurarActionPerformed
         // TODO add your handling code here:
+        String selectedBackup = listaBackups.getSelectedValue();
+
+        if (selectedBackup == null) {
+            JOptionPane.showMessageDialog(this, "⚠️ Selecciona un backup de la lista.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(this,
+                "¿Estás seguro de restaurar el backup?\n⚠️ Esto sobrescribirá la base de datos actual.",
+                "Confirmar Restauración",
+                JOptionPane.YES_NO_OPTION);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            restaurarBackup(selectedBackup);
+        }
     }//GEN-LAST:event_btn_restaurarActionPerformed
 
     private void btn_generarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_generarActionPerformed
@@ -404,6 +489,7 @@ public class Backups extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lbl_status;
+    private javax.swing.JLabel lbl_status2;
     private javax.swing.JList<String> listaBackups;
     // End of variables declaration//GEN-END:variables
 }
