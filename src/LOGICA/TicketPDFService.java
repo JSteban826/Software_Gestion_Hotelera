@@ -46,7 +46,7 @@ public class TicketPDFService {
         String fechaActual = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         String nombreArchivo = "Reserva_" + pr.idCliente + "_" + fechaActual + ".pdf";
 
-        File directorio = new File("Facturas_reservas");
+        File directorio = new File("Facturas_reserva");
         if (!directorio.exists()) {
             throw new TicketNoGeneradoException(CodigoError.ERR_GENERAR_TICKET,
                     "La ruta para guardar la factura no existe: " + directorio.getAbsolutePath());
