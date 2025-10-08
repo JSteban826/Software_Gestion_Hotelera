@@ -291,7 +291,6 @@ public class Backups extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
         btn_generar = new javax.swing.JButton();
         btn_restaurar = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -300,13 +299,11 @@ public class Backups extends javax.swing.JFrame {
         btn_refrescar = new javax.swing.JButton();
         ProgressBar_backup = new javax.swing.JProgressBar();
         lbl_status2 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
-
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("BACKUPS");
 
         btn_generar.setText("Generar");
         btn_generar.addActionListener(new java.awt.event.ActionListener() {
@@ -337,14 +334,17 @@ public class Backups extends javax.swing.JFrame {
 
         lbl_status2.setText("Presione para Restaurar la copia de seguridad");
 
+        jLabel9.setBackground(new java.awt.Color(225, 225, 191));
+        jLabel9.setFont(new java.awt.Font("Georgia", 3, 24)); // NOI18N
+        jLabel9.setForeground(new java.awt.Color(65, 104, 163));
+        jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/images/logo50.jpg"))); // NOI18N
+        jLabel9.setText("BACKUPS");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(93, 93, 93)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -364,13 +364,14 @@ public class Backups extends javax.swing.JFrame {
                                 .addComponent(ProgressBar_backup, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, Short.MAX_VALUE)))))
                 .addContainerGap(84, Short.MAX_VALUE))
+            .addComponent(jLabel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(30, 30, 30)
-                .addComponent(jLabel1)
-                .addGap(41, 41, 41)
+                .addGap(20, 20, 20)
+                .addComponent(jLabel9)
+                .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btn_generar)
                     .addComponent(lbl_status, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -485,7 +486,7 @@ public class Backups extends javax.swing.JFrame {
     private javax.swing.JButton btn_generar;
     private javax.swing.JButton btn_refrescar;
     private javax.swing.JButton btn_restaurar;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lbl_status;
