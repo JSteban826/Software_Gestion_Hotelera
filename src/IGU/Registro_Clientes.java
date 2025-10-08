@@ -4,6 +4,7 @@
  */
 package IGU;
 
+import LOGICA.ClienteService;
 import LOGICA.HistorialManagerSingleton;
 import LOGICA.HistorialManager;
 import LOGICA.ManejadorErrores;
@@ -26,13 +27,14 @@ public class Registro_Clientes extends javax.swing.JFrame {
     Habitaciones hab1;
     Reserva rsv1;
     Politica pa;
-    String cedula, nombre, apellido, correo, telefono;
+    private ClienteService clienteService;
 
     /**
      * Creates new form Principal
      */
     public Registro_Clientes() {
         initComponents();
+        clienteService = new ClienteService();
         pa = new Politica();
         // Resto de la configuración
         pa.setVisible(true);  // Muestra la ventana Politica
@@ -60,29 +62,7 @@ public class Registro_Clientes extends javax.swing.JFrame {
     }
 
     // Método para insertar un cliente en la tabla Clientes
-    public static void insertarCliente(String cedula, String nombre, String apellido, String correo, String telefono) {
-        String sql = "INSERT INTO Clientes (Cedula, nombre, apellido, correo_electronico, telefono) VALUES (?, ?, ?, ?, ?)";
-        try (Connection conn = ConexionBD.conectar(); PreparedStatement statement = conn.prepareStatement(sql)) {
-            statement.setString(1, cedula);
-            statement.setString(2, nombre);
-            statement.setString(3, apellido);
-            statement.setString(4, correo);
-            statement.setString(5, telefono);
-            statement.executeUpdate();
-            JOptionPane.showMessageDialog(null, "Cliente insertado correctamente.");
-        } catch (SQLIntegrityConstraintViolationException e) {
-            ManejadorErrores.valorDuplicado(e);
-        } catch (SQLTransactionRollbackException e) {
-            ManejadorErrores.tablasBloqueadas(e);
-        } catch (SQLTimeoutException e) {
-            ManejadorErrores.bloqueoTimeout(e);
-        } catch (SQLException e) {
-            ManejadorErrores.bloqueTrigger(e);
-        } catch (Exception e) {
-            ManejadorErrores.errorDesconocido(e);
-        }
-
-    }
+  
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -334,7 +314,6 @@ public class Registro_Clientes extends javax.swing.JFrame {
         JMenuClientes.setText("Historial Clientes");
         JMenuClientes.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                JMenuClientesActionPerformed(evt);
             }
         });
         jMenu7.add(JMenuClientes);
@@ -363,62 +342,37 @@ public class Registro_Clientes extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btn_ingresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ingresarActionPerformed
-        // TODO add your handling code here:
-
-        try {
-            // Validación previa
+         try {
             if (txt_cedula.getText().trim().isEmpty()
                     || txt_nombre.getText().trim().isEmpty()
                     || txt_apellido.getText().trim().isEmpty()
                     || txt_correo.getText().trim().isEmpty()
                     || txt_telefono.getText().trim().isEmpty()) {
-
                 throw new NullPointerException("Campos obligatorios vacíos, diligéncielos por favor.");
             }
 
-            // Asignación segura con .trim()
             String cedula = txt_cedula.getText().trim();
             String nombre = txt_nombre.getText().trim();
             String apellido = txt_apellido.getText().trim();
             String correo = txt_correo.getText().trim();
             String telefono = txt_telefono.getText().trim();
 
-            // Registro
-            insertarCliente(cedula, nombre, apellido, correo, telefono);
+            // 👉 Ahora usa el servicio
+            boolean insertado = clienteService.insertarCliente(cedula, nombre, apellido, correo, telefono);
 
-            // Historial
+            if (insertado) {
+                JOptionPane.showMessageDialog(this, "Cliente registrado correctamente");
+            }
+
             HistorialManager historial_acciones = HistorialManagerSingleton.getInstancia();
             historial_acciones.registrarAccion("Registro de Cliente: " + nombre + " " + apellido);
 
-        } catch (NullPointerException e) {
-            ManejadorErrores.camposVacios(e); // Manejador de errores para campos vacíos
-
-        } catch (NumberFormatException e) {
-            ManejadorErrores.conversion(e);
+        } catch (Exception e) {
+            // el ManejadorErrores ya se encarga de mostrar mensajes
         }
+    }
 
-    }//GEN-LAST:event_btn_ingresarActionPerformed
-
-    private void JMenuClientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JMenuClientesActionPerformed
-        // TODO add your handling code here:
-        cl1 = new Clientes();
-        cl1.setVisible(true);
-
-        cl1.setResizable(false);
-        Dimension pantalla = Toolkit.getDefaultToolkit().getScreenSize();
-
-        // Calcular la posición para centrar el JFrame
-        int x = (pantalla.width - cl1.getSize().width) / 2;
-        int y = (pantalla.height - cl1.getSize().height) / 2;
-
-        // Posicionar la ventana en el centro de la pantalla
-        cl1.setLocation(x, y);
-
-        //Agregar Accion a Historial
-        HistorialManager historial_acciones = HistorialManagerSingleton.getInstancia();
-        historial_acciones.registrarAccion("Ingreso a Clientes ");
-    }//GEN-LAST:event_JMenuClientesActionPerformed
-
+    
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
         rsv1 = new Reserva();

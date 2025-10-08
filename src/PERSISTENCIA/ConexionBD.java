@@ -7,8 +7,8 @@ import java.sql.SQLException;
 public class ConexionBD {
 
     private static final String URL = "jdbc:mysql://database-hotel.mysql.database.azure.com:3306/hotel";
-    private static final String USUARIO = "Juanes";
-    private static final String CONTRASEÑA = "Hotel01020304@";
+    public static final String USUARIO = "Juanes";
+    public static final String CONTRASEÑA = "Hotel01020304@";
 
     public static Connection conectar() {
         Connection conexion = null;

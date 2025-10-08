@@ -5,6 +5,8 @@
 package IGU;
 
 import LOGICA.Cliente1;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import LOGICA.ClienteNoExisteException;
 import LOGICA.HistorialManagerSingleton;
 import LOGICA.HistorialManager;
@@ -26,6 +28,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
+import LOGICA.AcompañantesService;
 
 public class Acompañantes extends javax.swing.JFrame {
 
@@ -35,6 +38,7 @@ public class Acompañantes extends javax.swing.JFrame {
     Reserva rsv1;
     String documento, nombre, apellido, telefono, parentesco;
     int id_check_in, edad;
+     private final AcompañantesService service = new AcompañantesService();
 
     /**
      * Creates new form Principal
@@ -45,22 +49,21 @@ public class Acompañantes extends javax.swing.JFrame {
         setDefaultCloseOperation(Acompañantes.DISPOSE_ON_CLOSE); // ✅ SOLO CIERRA JFrame2
 
         cargarClientesEnComboBox();
+        
         pa = new Politica();
 
         // Ahora puedes llamar al método setDefaultCloseOperation de manera segura
         pa.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // Solo cierra la ventana Politica
 
-        // Resto de la configuración
-        pa.setVisible(true);  // Muestra la ventana Politica
+        
+        pa.setVisible(true);  
         pa.setResizable(false);
 
-        // Centrar la ventana
         Dimension pantalla = Toolkit.getDefaultToolkit().getScreenSize();
         int x = (pantalla.width - pa.getSize().width) / 2;
         int y = (pantalla.height - pa.getSize().height) / 2;
         pa.setLocation(x, y);
 
-        // Agregar acción al historial
         HistorialManager historial_acciones = HistorialManagerSingleton.getInstancia();
         historial_acciones.registrarAccion("Ingreso a Politica");
     }
@@ -70,124 +73,32 @@ public class Acompañantes extends javax.swing.JFrame {
         return retValue;
     }
 
-    // Método para insertar un acompañante en la tabla Acompañantes
-    public static void insertarAcompañante(String documento, int id_check_in, String nombre, String apellido, String telefono, String parentesco, int edad) {
-        String sql = "INSERT INTO acompanantes (Documento, id_check_in, nombre, apellido, telefono, parentesco, edad) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conn = ConexionBD.conectar(); PreparedStatement statement = conn.prepareStatement(sql)) {
-            statement.setString(1, documento);
-            statement.setInt(2, id_check_in);
-            statement.setString(3, nombre);
-            statement.setString(4, apellido);
-            statement.setString(5, telefono);
-            statement.setString(6, parentesco);
-            statement.setInt(7, edad);
-            statement.executeUpdate();
-            JOptionPane.showMessageDialog(null, "Acompañante insertado correctamente.");
-        } catch (SQLIntegrityConstraintViolationException e) {
-            ManejadorErrores.valorDuplicado(e);
-        } catch (SQLTransactionRollbackException e) {
-            ManejadorErrores.tablasBloqueadas(e);
-        } catch (SQLTimeoutException e) {
-            ManejadorErrores.bloqueoTimeout(e);
-        } catch (SQLException e) {
-            ManejadorErrores.bloqueTrigger(e);
-        } catch (Exception e) {
-            ManejadorErrores.errorDesconocido(e);
-        }
-    }
-
-    // Asegúrate de importar LOGICA.Cliente1
+   
     Map<String, Cliente1> datosClientes = new HashMap<>();
+    
+     private void cargarClientesEnComboBox() {
+        cmb_clientes.removeAllItems();
+        datosClientes = service.cargarClientes();
 
-    public void cargarClientesEnComboBox() {
-        String sql = "SELECT Cedula, nombre, apellido FROM clientes";
-
-        try (java.sql.Connection conn = ConexionBD.conectar(); PreparedStatement statement = conn.prepareStatement(sql); ResultSet rs = statement.executeQuery()) {
-
-            cmb_clientes.removeAllItems();
-            datosClientes.clear();
-            txt_cedula_cliente.setText("");
-            txt_id_check_in.setText("");
-
-            while (rs.next()) {
-                String cedula = rs.getString("Cedula");
-                String nombre = rs.getString("nombre");
-                String apellido = rs.getString("apellido");
-
-                Cliente1 cliente = new Cliente1(cedula, nombre, apellido);
-                cmb_clientes.addItem(cliente.getNombreCompleto());
-                datosClientes.put(cliente.getNombreCompleto(), cliente);
-            }
-
-        } catch (SQLException e) {
-            ManejadorErrores.errorSelectSQL(e);
+        for (String nombreCompleto : datosClientes.keySet()) {
+            cmb_clientes.addItem(nombreCompleto);
         }
 
-        // Listener para actualizar campos cuando seleccionas un cliente
         cmb_clientes.addActionListener(e -> {
             String seleccionado = (String) cmb_clientes.getSelectedItem();
-            if (seleccionado != null && datosClientes.containsKey(seleccionado)) {
+            if (seleccionado != null) {
                 Cliente1 cliente = datosClientes.get(seleccionado);
                 txt_cedula_cliente.setText(cliente.getCedula());
 
-                // Cargar datos del Check In
-                cargarDatosCheckIn(cliente.getCedula());
+                int idCheck = service.buscarCheckIn(cliente.getCedula());
+                txt_id_check_in.setText(idCheck == -1 ? "No encontrado" : String.valueOf(idCheck));
             }
         });
     }
 
     // Método auxiliar para cargar datos de reserva y nombre de habitación
-    private void cargarDatosCheckIn(String cedulaCliente) {
-        String sqlReserva = "SELECT id_check_in FROM check_in WHERE id_cliente = ?";
-
-        try (java.sql.Connection conn = ConexionBD.conectar(); PreparedStatement psReserva = conn.prepareStatement(sqlReserva)) {
-
-            psReserva.setString(1, cedulaCliente);
-            try (ResultSet rsReserva = psReserva.executeQuery()) {
-                if (rsReserva.next()) {
-                    int id_check = rsReserva.getInt("id_check_in");
-
-                    txt_id_check_in.setText(String.valueOf(id_check));
-
-                } else {
-                    txt_id_check_in.setText("No encontrado");
-                }
-            }
-
-        } catch (SQLException e) {
-            ManejadorErrores.errorSelectSQL(e);
-        }
-    }
-
-    private void buscarClientePorCedula(String cedula) throws ClienteNoExisteException, SQLException {
-        String sql = "SELECT Cedula, nombre, apellido FROM clientes WHERE Cedula = ?";
-
-        try (Connection conn = ConexionBD.conectar(); PreparedStatement statement = conn.prepareStatement(sql)) {
-            statement.setString(1, cedula);
-            try (ResultSet rs = statement.executeQuery()) {
-                if (rs.next()) {
-                    String nombre = rs.getString("nombre");
-                    String apellido = rs.getString("apellido");
-
-                    // Crear cliente
-                    Cliente1 cliente = new Cliente1(cedula, nombre, apellido);
-
-                    // Mostrar datos
-                    cmb_clientes.setSelectedItem(cliente.getNombreCompleto());
-                    txt_id_check_in.setText(""); // Limpiar antes de buscar
-
-                    // Cargar datos del Check In
-                    cargarDatosCheckIn(cliente.getCedula());
-
-                } else {
-                    throw new ClienteNoExisteException("El cliente con cédula " + cedula + " no existe en la base de datos.");
-                }
-            }
-
-        } catch (SQLException e) {
-            ManejadorErrores.errorSelectSQL(e);
-        }
-    }
+   
+   
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -538,41 +449,28 @@ public class Acompañantes extends javax.swing.JFrame {
 
     private void btn_ingresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ingresarActionPerformed
         // TODO add your handling code here:
-        try {
-            // Validación previa de campos vacíos antes del parseo
-            if (txt_cedula.getText().trim().isEmpty()
-                    || txt_id_check_in.getText().trim().isEmpty()
-                    || txt_nombre.getText().trim().isEmpty()
-                    || txt_apellido.getText().trim().isEmpty()
-                    || txt_telefono.getText().trim().isEmpty()
-                    || txt_parentesco.getText().trim().isEmpty()
-                    || txt_edad.getText().trim().isEmpty()) {
-
+         try {
+            if (txt_cedula.getText().isEmpty() || txt_id_check_in.getText().isEmpty()
+                    || txt_nombre.getText().isEmpty() || txt_apellido.getText().isEmpty()
+                    || txt_telefono.getText().isEmpty() || txt_parentesco.getText().isEmpty()
+                    || txt_edad.getText().isEmpty()) {
                 throw new NullPointerException("Todos los campos deben estar completos.");
             }
 
-            // Parseo seguro después de validaciones
-            String documento = txt_cedula.getText().trim();
-            int id_check_in = Integer.parseInt(txt_id_check_in.getText().trim());
-            String nombre = txt_nombre.getText().trim();
-            String apellido = txt_apellido.getText().trim();
-            String telefono = txt_telefono.getText().trim();
-            String parentesco = txt_parentesco.getText().trim();
-            int edad = Integer.parseInt(txt_edad.getText().trim());
+            service.insertarAcompañante(
+                txt_cedula.getText().trim(),
+                Integer.parseInt(txt_id_check_in.getText().trim()),
+                txt_nombre.getText().trim(),
+                txt_apellido.getText().trim(),
+                txt_telefono.getText().trim(),
+                txt_parentesco.getText().trim(),
+                Integer.parseInt(txt_edad.getText().trim())
+            );
 
-            // Registro del acompañante
-            insertarAcompañante(documento, id_check_in, nombre, apellido, telefono, parentesco, edad);
-
-            // Agregar acción al historial
-            HistorialManager historial_acciones = HistorialManagerSingleton.getInstancia();
-            historial_acciones.registrarAccion("Registro de Acompañante: " + nombre + " " + apellido);
-
-        } catch (NullPointerException e) {
-            ManejadorErrores.camposVacios(e); // Maneja campos vacíos
-        } catch (NumberFormatException e) {
-            ManejadorErrores.conversion(e);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al registrar acompañante: " + e.getMessage());
         }
-
+    
 
     }//GEN-LAST:event_btn_ingresarActionPerformed
 
@@ -598,27 +496,32 @@ public class Acompañantes extends javax.swing.JFrame {
 
     private void lb_buscarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lb_buscarMouseClicked
         // TODO add your handling code here:
-        try {
-            String cedulaIngresada = txt_cedula_cliente.getText().trim();
+          try {
+        String cedulaIngresada = txt_cedula_cliente.getText().trim();
 
-            if (cedulaIngresada.isEmpty()) {
-                throw new NullPointerException("Campos vacíos");
-
-            }
-
-            buscarClientePorCedula(cedulaIngresada);
-
-        } catch (NullPointerException e) {
-            ManejadorErrores.camposVacios(e); // Manejador de errores para campos vacíos
-
-        } catch (ClienteNoExisteException ex) {
-           ManejadorErrores.clienteNoExiste(ex);
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Error al buscar el cliente en la base de datos.");
-            Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, "Error SQL al buscar cliente", ex);
+        if (cedulaIngresada.isEmpty()) {
+            throw new NullPointerException("El campo de cédula está vacío");
         }
 
-    }//GEN-LAST:event_lb_buscarMouseClicked
+        // Crear instancia del DAO
+       AcompañantesService service = new AcompañantesService();
+
+        // Llamar al método de búsqueda
+        Cliente1 cliente = service.buscarClientePorCedula(cedulaIngresada);
+
+      
+    } catch (NullPointerException e) {
+        ManejadorErrores.camposVacios(e);
+
+    } catch (ClienteNoExisteException ex) {
+        ManejadorErrores.clienteNoExiste(ex);
+
+    } catch (SQLException ex) {
+        JOptionPane.showMessageDialog(this, "Error al buscar el cliente en la base de datos.");
+        Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, "Error SQL al buscar cliente", ex);
+    }
+}
+//GEN-LAST:event_lb_buscarMouseClicked
 
     /**
      * @param args the command line arguments

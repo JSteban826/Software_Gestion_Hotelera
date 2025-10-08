@@ -2,7 +2,6 @@ package LOGICA;
 
 import java.util.Locale;
 import javax.swing.JOptionPane;
-import LOGICA.PagoFallidoException;
 
 public class PagoService {
 

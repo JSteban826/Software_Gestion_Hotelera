@@ -7,6 +7,8 @@ public class CodigoError {
     public static final String ERR_CAMPOS_VACIOS             = "ERR001"; // Campos vacíos
     public static final String ERR_CONVERSION_NUMERICA       = "ERR002"; // Error de formato numérico
     public static final String ERR_LOGICA_NEGOCIO            = "ERR003"; // Regla de negocio fallida
+    public static final String ERR_ABRIR_ARCHIVO             = "ERR004"; // No se pudo abrir el archivo
+    public static final String ERR_ARCHIVO_INEXISTENTE       = "ERR005"; // No se encontro el archivo
 
     // 🗄️ BASE DE DATOS
     public static final String ERR_DB_CONEXION               = "ERR100"; // Error al conectar a la BD
@@ -19,6 +21,8 @@ public class CodigoError {
     public static final String ERR_TABLAS_BLOQUEADAS_TRIGGER = "ERR107"; // Tablas bloqueadas Trigger
     public static final String ERR_TABLAS_BLOQUEADAS_TIMEOUT = "ERR108"; // Tablas bloqueadas Timeout
     public static final String ERR_DELETE_DATOS              = "ERR109"; // Error al eliminar datos
+    public static final String ERR_BD_BACKUP                 = "ERR110"; // Error al crear backup de la BD
+    public static final String ERR_BD_RESTORE                = "ERR111"; // Error al restaurar backup de la BD
 
     // 👤 USUARIOS Y ACCESO
     public static final String ERR_CLIENTE_NO_EXISTE         = "ERR200"; // Cliente no encontrado
@@ -33,6 +37,9 @@ public class CodigoError {
     public static final String ERR_ENVIAR_ENLACE             = "ERR402"; // Error al enviar enlace de pago
     public static final String ERR_GENERAR_TICKET            = "ERR403"; // Error al generar ticket
     public static final String ERR_CANCELAR_OPERACION        = "ERR404"; // Error al cancelar una operación
+    
+    //  API
+    public static final String ERR_CONEXIOn_API              = "ERR500"; // Error al conectar API
 
 }
 

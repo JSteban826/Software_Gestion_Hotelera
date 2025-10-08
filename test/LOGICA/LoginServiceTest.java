@@ -1,3 +1,5 @@
+package LOGICA;
+
 import LOGICA.LoginService;
 import org.junit.Before;
 import org.junit.Test;

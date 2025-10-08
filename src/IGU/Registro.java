@@ -5,6 +5,7 @@ import LOGICA.HistorialManagerSingleton;
 import LOGICA.HistorialManager;
 import LOGICA.Logger;
 import LOGICA.ManejadorErrores;
+import LOGICA.RegistroService;
 import LOGICA.Rol;
 import PERSISTENCIA.ConexionBD;
 import java.awt.Color;
@@ -23,7 +24,7 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 
 public class Registro extends javax.swing.JFrame {
-
+private RegistroService registroService = new RegistroService();
     int xMouse, yMouse;
     String usuario, contraseña;
 
@@ -373,27 +374,29 @@ public class Registro extends javax.swing.JFrame {
 
     private void btn_guardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_guardarActionPerformed
 
-        String usuario = userTxt.getText();
-        String contraseña = ContraTxt.getText();
-        Rol rolSeleccionado = (Rol) cmb_roles.getSelectedItem();
+           String usuario = userTxt.getText();
+    String contraseña = ContraTxt.getText();
+    Rol rolSeleccionado = (Rol) cmb_roles.getSelectedItem();
 
-        try {
-            if (usuario.isEmpty() || contraseña.isEmpty() || rolSeleccionado == null) {
-                throw new NullPointerException("Campos vacíos");
-
-            }
-
-            insertarUsuario(usuario, contraseña, rolSeleccionado.getId());
-
-            // Agregar acción a historial
-            HistorialManager historial_acciones = HistorialManagerSingleton.getInstancia();
-            historial_acciones.registrarAccion("Registro de Usuario: " + usuario);
-
-        } catch (NullPointerException e) {
-            ManejadorErrores.camposVacios(e);
-        } catch (SQLException ex) {
-            java.util.logging.Logger.getLogger(Registro.class.getName()).log(Level.SEVERE, null, ex);
+    try {
+        if (!registroService.validarCampos(usuario, contraseña) || rolSeleccionado == null) {
+            throw new NullPointerException("Campos vacíos");
         }
+
+        boolean insertado = registroService.insertarUsuario(usuario, contraseña, rolSeleccionado.getId());
+        if (insertado) {
+            JOptionPane.showMessageDialog(this, "Usuario insertado correctamente.");
+        }
+
+        // Historial
+        HistorialManager historial_acciones = HistorialManagerSingleton.getInstancia();
+        historial_acciones.registrarAccion("Registro de Usuario: " + usuario);
+
+    } catch (NullPointerException e) {
+        ManejadorErrores.camposVacios(e);
+    } catch (SQLException ex) {
+        java.util.logging.Logger.getLogger(Registro.class.getName()).log(Level.SEVERE, null, ex);
+    }
 
     }//GEN-LAST:event_btn_guardarActionPerformed
 

@@ -1,40 +1,27 @@
 package IGU;
 
 import LOGICA.Check_Out;
-import LOGICA.CorreoPago;
 import PERSISTENCIA.ConexionBD;
 import LOGICA.Cliente;
 import LOGICA.ClienteNoExisteException;
-import LOGICA.CodigoError;
 import LOGICA.HistorialManager;
 import LOGICA.HistorialManagerSingleton;
 import IGU.Reserva;
-import static LOGICA.enviarCorreoConAdjunto.enviarCorreoConAdjunto;
-import LOGICA.CorreoNoEnviadoException;
 import LOGICA.ManejadorErrores;
 import LOGICA.PagoService;
 import LOGICA.PagoService.MetodoPago;
-import LOGICA.TicketNoGeneradoException;
-import LOGICA.GestionReservas;
-import LOGICA.Reservas;
+import LOGICA.TicketPDFService;
+import LOGICA.TicketPDFService.ParametrosCheckOut;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JOptionPane;
-import java.util.Locale;
-import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.*;
-import com.toedter.calendar.JDateChooser;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.sql.Connection;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.SQLTimeoutException;
 import java.sql.SQLTransactionRollbackException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComboBox;
@@ -313,230 +300,6 @@ public class check_out extends javax.swing.JFrame {
         }
 
         return siguienteId;
-    }
-
-    public void generarFacturaPDF() {
-        Document documento = new Document();
-
-        try {
-            String nombreCliente = cmb_clientes.getSelectedItem().toString();
-            String idCliente = txt_id_cliente_chk.getText();
-            String correo = txt_correo.getText().trim();
-            String idCheck = txt_id_check.getText();
-            String diasEstancia = txt_dias.getText();
-            String valorTotal = txt_Valor_total.getText();
-
-            String fechaActual = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-            String nombreArchivo = "factura_check_out_" + idCliente + "_" + fechaActual + ".pdf";
-
-            // Validar existencia de la ruta antes de escribir el archivo
-            File directorio = new File("Facturas_check_out");
-            if (!directorio.exists() || !directorio.isDirectory()) {
-                throw new TicketNoGeneradoException(CodigoError.ERR_GENERAR_TICKET,
-                        "La ruta para guardar la factura no existe: " + directorio.getAbsolutePath());
-            }
-
-            String ruta = directorio.getAbsolutePath() + File.separator + "Facturas_" + nombreArchivo;
-            if (correo.isEmpty() || !correo.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,6}$")) {
-                JOptionPane.showMessageDialog(this, "Correo inválido. Verifica la dirección.");
-                return;
-            }
-            PdfWriter.getInstance(documento, new FileOutputStream(ruta));
-            documento.open();
-
-            // Logo y nombre del hotel
-            Image logo = Image.getInstance(getClass().getResource("/com/images/coral.png"));
-            logo.scaleAbsolute(60, 60);
-
-            PdfPTable tablaEncabezado = new PdfPTable(2);
-            tablaEncabezado.setWidthPercentage(100);
-
-            PdfPCell celdaNombre = new PdfPCell(new Phrase("Resort Bahía Coral", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16, BaseColor.BLACK)));
-            celdaNombre.setBorder(Rectangle.NO_BORDER);
-            celdaNombre.setVerticalAlignment(Element.ALIGN_MIDDLE);
-            celdaNombre.setHorizontalAlignment(Element.ALIGN_LEFT);
-
-            PdfPCell celdaLogo = new PdfPCell(logo);
-            celdaLogo.setBorder(Rectangle.NO_BORDER);
-            celdaLogo.setHorizontalAlignment(Element.ALIGN_RIGHT);
-
-            tablaEncabezado.addCell(celdaNombre);
-            tablaEncabezado.addCell(celdaLogo);
-
-            documento.add(tablaEncabezado);
-
-            documento.add(Chunk.NEWLINE);
-
-            // TÍTULO GRANDE (Nombre de la Factura)
-            Paragraph subtitulo = new Paragraph("N°Ticket:/" + idCliente + "/" + fechaActual + "/", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 20, BaseColor.DARK_GRAY));
-            subtitulo.setAlignment(Element.ALIGN_RIGHT);
-            documento.add(subtitulo);
-
-            documento.add(Chunk.NEWLINE);
-
-            // TÍTULO GRANDE (Nombre de la Factura)
-            Paragraph titulo = new Paragraph("Ticket de Check Out", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 20, BaseColor.DARK_GRAY));
-            titulo.setAlignment(Element.ALIGN_CENTER);
-            documento.add(titulo);
-
-            documento.add(Chunk.NEWLINE);
-
-            // Tabla de información del cliente (ahora bonita)
-            PdfPTable tablaCliente = new PdfPTable(2);
-            tablaCliente.setWidthPercentage(100);
-            tablaCliente.setSpacingBefore(10);
-
-            // Fila de título que ocupa las 2 columnas
-            PdfPCell celdaTitulo = new PdfPCell(new Phrase("Datos del Cliente", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16, BaseColor.WHITE)));
-            celdaTitulo.setBackgroundColor(new BaseColor(30, 144, 255)); // Un azul bonito (puedes cambiar el color)
-            celdaTitulo.setHorizontalAlignment(Element.ALIGN_CENTER);
-            celdaTitulo.setPadding(12);
-            celdaTitulo.setColspan(2); // MUY IMPORTANTE para que abarque las 2 columnas
-            tablaCliente.addCell(celdaTitulo);
-
-            // Encabezado
-            PdfPCell celdaDato = new PdfPCell(new Phrase("Dato", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.WHITE)));
-            celdaDato.setBackgroundColor(BaseColor.DARK_GRAY);
-            celdaDato.setHorizontalAlignment(Element.ALIGN_CENTER);
-            celdaDato.setPadding(10);
-
-            PdfPCell celdaInformacion = new PdfPCell(new Phrase("Información", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.WHITE)));
-            celdaInformacion.setBackgroundColor(BaseColor.DARK_GRAY);
-            celdaInformacion.setHorizontalAlignment(Element.ALIGN_CENTER);
-            celdaInformacion.setPadding(10);
-
-            tablaCliente.addCell(celdaDato);
-            tablaCliente.addCell(celdaInformacion);
-
-            // Datos
-            tablaCliente.addCell(getCeldaServicioTabla("Cliente:"));
-            tablaCliente.addCell(getCeldaValorTabla(nombreCliente));
-            tablaCliente.addCell(getCeldaServicioTabla("ID Cliente:"));
-            tablaCliente.addCell(getCeldaValorTabla(idCliente));
-            tablaCliente.addCell(getCeldaServicioTabla("Correo:"));
-            tablaCliente.addCell(getCeldaValorTabla(correo));
-            tablaCliente.addCell(getCeldaServicioTabla("ID Check:"));
-            tablaCliente.addCell(getCeldaValorTabla(idCheck));
-            tablaCliente.addCell(getCeldaServicioTabla("Días de estancia:"));
-            tablaCliente.addCell(getCeldaValorTabla(diasEstancia));
-
-            documento.add(tablaCliente);
-
-            // Tabla de servicios adicionales y total
-            PdfPTable tablaServicios = new PdfPTable(2);
-            tablaServicios.setWidthPercentage(100);
-            tablaServicios.setSpacingBefore(10);
-
-            // Fila de título que ocupa las 2 columnas
-            PdfPCell celdaTitulo1 = new PdfPCell(new Phrase("Servicios Adicionales", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16, BaseColor.WHITE)));
-            celdaTitulo1.setBackgroundColor(new BaseColor(30, 144, 255)); // Un azul bonito (puedes cambiar el color)
-            celdaTitulo1.setHorizontalAlignment(Element.ALIGN_CENTER);
-            celdaTitulo1.setPadding(12);
-            celdaTitulo1.setColspan(2); // MUY IMPORTANTE para que abarque las 2 columnas
-            tablaServicios.addCell(celdaTitulo1);
-
-            // Encabezado de tabla con color
-            PdfPCell celdaServicio = new PdfPCell(new Phrase("Servicio", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.WHITE)));
-            celdaServicio.setBackgroundColor(BaseColor.DARK_GRAY);
-            celdaServicio.setHorizontalAlignment(Element.ALIGN_CENTER);
-            celdaServicio.setPadding(10);
-
-            PdfPCell celdaPrecio = new PdfPCell(new Phrase("Valor", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.WHITE)));
-            celdaPrecio.setBackgroundColor(BaseColor.DARK_GRAY);
-            celdaPrecio.setHorizontalAlignment(Element.ALIGN_CENTER);
-            celdaPrecio.setPadding(10);
-
-            tablaServicios.addCell(celdaServicio);
-            tablaServicios.addCell(celdaPrecio);
-
-            // Agregar servicios seleccionados
-            boolean hayServicios = false;
-
-            if (chk_minibar.isSelected()) {
-                tablaServicios.addCell(getCeldaServicioTabla("Minibar"));
-                tablaServicios.addCell(getCeldaValorTabla("$15000")); // Puedes poner el valor real
-                hayServicios = true;
-            }
-            if (chk_restaurante.isSelected()) {
-                tablaServicios.addCell(getCeldaServicioTabla("Restaurante"));
-                tablaServicios.addCell(getCeldaValorTabla("$25000"));
-                hayServicios = true;
-            }
-            if (chk_spa.isSelected()) {
-                tablaServicios.addCell(getCeldaServicioTabla("Spa"));
-                tablaServicios.addCell(getCeldaValorTabla("$40000"));
-                hayServicios = true;
-            }
-            if (chk_habitacion.isSelected()) {
-                tablaServicios.addCell(getCeldaServicioTabla("Daño en habitación"));
-                tablaServicios.addCell(getCeldaValorTabla("$80000"));
-                hayServicios = true;
-            }
-            if (!hayServicios) {
-                PdfPCell celdaNoServicios = new PdfPCell(new Phrase("No se utilizaron servicios adicionales."));
-                celdaNoServicios.setColspan(2);
-                celdaNoServicios.setHorizontalAlignment(Element.ALIGN_CENTER);
-                tablaServicios.addCell(celdaNoServicios);
-            }
-
-            // Agregar total
-            PdfPCell celdaTotal = new PdfPCell(new Phrase("TOTAL", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14)));
-            celdaTotal.setColspan(1);
-            celdaTotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
-            celdaTotal.setPaddingTop(10);
-            celdaTotal.setBorderWidthTop(2f);
-
-            PdfPCell celdaValorTotal = new PdfPCell(new Phrase("$" + valorTotal, FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14)));
-            celdaValorTotal.setHorizontalAlignment(Element.ALIGN_CENTER);
-            celdaValorTotal.setPaddingTop(10);
-            celdaValorTotal.setBorderWidthTop(2f);
-
-            tablaServicios.addCell(celdaTotal);
-            tablaServicios.addCell(celdaValorTotal);
-
-            documento.add(tablaServicios);
-
-            documento.close();
-            String asunto = "Ticket Check-Out Hotel";
-            String cuerpo = "Adjunto encontrará su ticket correspondiente a su estadía. ¡Gracias por elegirnos!";
-            enviarCorreoConAdjunto(correo, asunto, cuerpo, ruta);
-
-            JOptionPane.showMessageDialog(null, "Ticket generada con éxito.");
-            JOptionPane.showMessageDialog(null, "Ticket guardada en:\n" + ruta);
-
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Error al generar PDF: " + e.getMessage());
-        }
-
-    }
-
-// Métodos auxiliares
-    private PdfPCell getCeldaEtiqueta(String texto) {
-        PdfPCell celda = new PdfPCell(new Phrase(texto, FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12)));
-        celda.setBorder(Rectangle.NO_BORDER);
-        celda.setHorizontalAlignment(Element.ALIGN_LEFT);
-        return celda;
-    }
-
-    private PdfPCell getCeldaValor(String texto) {
-        PdfPCell celda = new PdfPCell(new Phrase(texto, FontFactory.getFont(FontFactory.HELVETICA, 12)));
-        celda.setBorder(Rectangle.NO_BORDER);
-        celda.setHorizontalAlignment(Element.ALIGN_LEFT);
-        return celda;
-    }
-
-    private PdfPCell getCeldaServicioTabla(String texto) {
-        PdfPCell celda = new PdfPCell(new Phrase(texto, FontFactory.getFont(FontFactory.HELVETICA, 12)));
-        celda.setHorizontalAlignment(Element.ALIGN_CENTER);
-        celda.setPadding(5);
-        return celda;
-    }
-
-    private PdfPCell getCeldaValorTabla(String texto) {
-        PdfPCell celda = new PdfPCell(new Phrase(texto, FontFactory.getFont(FontFactory.HELVETICA, 12)));
-        celda.setHorizontalAlignment(Element.ALIGN_CENTER);
-        celda.setPadding(5);
-        return celda;
     }
 
     @SuppressWarnings("unchecked")
@@ -959,14 +722,29 @@ public class check_out extends javax.swing.JFrame {
     }//GEN-LAST:event_txt_diasActionPerformed
 
     private void btn_facturaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_facturaActionPerformed
-        // TODO add your handling code here:
-        generarFacturaPDF();
+        try {
+            ParametrosCheckOut pchk = new ParametrosCheckOut();
+            pchk.idCheck = txt_id_check.getText();
+            pchk.idCliente = txt_id_cliente_chk.getText();
+            pchk.nombreCliente = cmb_clientes.getSelectedItem().toString();
+            pchk.correo = txt_correo.getText();
+            pchk.diasEstancia = txt_dias.getText();
+            pchk.valorTotal = txt_Valor_total.getText();
+            pchk.minibar = chk_minibar.isSelected();
+            pchk.restaurante = chk_restaurante.isSelected();
+            pchk.spa = chk_spa.isSelected();
+            pchk.habitacion = chk_habitacion.isSelected();
 
-        String nombre = (String) cmb_clientes.getSelectedItem();
+            TicketPDFService.generarFacturaCheckOut(pchk);
 
-        //Agregar Accion a Historial
-        HistorialManager historial_acciones = HistorialManagerSingleton.getInstancia();
-        historial_acciones.registrarAccion("Ticket del cliente: " + nombre + " generada");
+            String nombre = (String) cmb_clientes.getSelectedItem();
+
+            //Agregar Accion a Historial
+            HistorialManager historial_acciones = HistorialManagerSingleton.getInstancia();
+            historial_acciones.registrarAccion("Ticket del cliente: " + nombre + " generada");
+        } catch (Exception ex) {
+            Logger.getLogger(check_out.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
     }//GEN-LAST:event_btn_facturaActionPerformed
 

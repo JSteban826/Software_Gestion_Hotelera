@@ -186,3 +186,76 @@ The last packet sent successfully to the server was 0 milliseconds ago. The driv
 
 The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
 [2025-10-02T11:47:38.514215600] ERR000 - Cannot invoke "java.sql.Connection.prepareStatement(String)" because "conn" is null
+[2025-10-02T20:10:34.353431600] ERR103 - Duplicate entry '123456' for key 'clientes.PRIMARY'
+[2025-10-02T20:10:40.028996800] ERR103 - Duplicate entry '123456' for key 'clientes.PRIMARY'
+[2025-10-02T20:13:27.507053900] ERR103 - Duplicate entry '2001' for key 'clientes.PRIMARY'
+[2025-10-02T20:15:13.428149300] ERR103 - Duplicate entry '34254' for key 'clientes.PRIMARY'
+[2025-10-02T20:15:19.826524] ERR103 - Duplicate entry '3001' for key 'clientes.PRIMARY'
+[2025-10-02T20:15:23.052509600] ERR103 - Duplicate entry '2001' for key 'clientes.PRIMARY'
+[2025-10-02T20:15:26.347078600] ERR103 - Duplicate entry '4001' for key 'clientes.PRIMARY'
+[2025-10-02T20:15:29.702754300] ERR103 - Duplicate entry '' for key 'clientes.PRIMARY'
+[2025-10-02T20:16:09.225499400] ERR103 - Duplicate entry '3001' for key 'clientes.PRIMARY'
+[2025-10-02T20:16:13.987498100] ERR103 - Duplicate entry '2001' for key 'clientes.PRIMARY'
+[2025-10-02T20:16:19.028747] ERR103 - Duplicate entry '4001' for key 'clientes.PRIMARY'
+[2025-10-02T20:16:22.227083300] ERR103 - Duplicate entry '' for key 'clientes.PRIMARY'
+[2025-10-02T20:19:15.453465] ERR103 - Duplicate entry '23333333' for key 'clientes.PRIMARY'
+[2025-10-02T20:22:02.666193200] ERR100 - Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+[2025-10-02T20:22:05.775542300] ERR000 - Cannot invoke "java.sql.Connection.prepareStatement(String)" because "conn" is null
+[2025-10-02T20:22:07.831972500] ERR100 - Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+[2025-10-02T20:22:08.948771300] ERR000 - Cannot invoke "java.sql.Connection.prepareStatement(String)" because "conn" is null
+[2025-10-03T11:18:50.252011600] ERR103 - Duplicate entry '23333333' for key 'clientes.PRIMARY'
+[2025-10-03T11:18:53.933710900] ERR103 - Duplicate entry '2001' for key 'clientes.PRIMARY'
+[2025-10-03T11:20:28.340916700] ERR103 - Duplicate entry '2021' for key 'clientes.PRIMARY'
+[2025-10-03T11:23:34.860925700] ERR103 - Duplicate entry '1099' for key 'clientes.PRIMARY'
+[2025-10-03T11:23:59.297432700] ERR103 - Duplicate entry '2031' for key 'clientes.PRIMARY'
+[2025-10-03T11:24:21.319643500] ERR103 - Duplicate entry '2031' for key 'clientes.PRIMARY'
+[2025-10-03T11:25:57.450142300] ERR001 - Campos vacíos
+[2025-10-04T14:27:57.972724700] ERR200 - El cliente con cédula 1069714447 no existe.
+[2025-10-04T14:28:16.100875700] ERR200 - El cliente con cédula 1069714447 no existe.
+[2025-10-04T14:41:09.622172100] ERR100 - Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+[2025-10-04T14:42:51.798259400] ERR100 - Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+[2025-10-04T14:58:59.119877600] ERR103 - Cannot add or update a child row: a foreign key constraint fails (`hotel`.`acompanantes`, CONSTRAINT `acompanantes_ibfk_1` FOREIGN KEY (`id_check_in`) REFERENCES `check_in` (`id_check_in`))
+[2025-10-04T14:59:40.787403200] ERR103 - Cannot add or update a child row: a foreign key constraint fails (`hotel`.`acompanantes`, CONSTRAINT `acompanantes_ibfk_1` FOREIGN KEY (`id_check_in`) REFERENCES `check_in` (`id_check_in`))
+[2025-10-04T14:59:50.311420700] ERR103 - Cannot add or update a child row: a foreign key constraint fails (`hotel`.`acompanantes`, CONSTRAINT `acompanantes_ibfk_1` FOREIGN KEY (`id_check_in`) REFERENCES `check_in` (`id_check_in`))
+[2025-10-04T14:59:58.060271300] ERR103 - Cannot add or update a child row: a foreign key constraint fails (`hotel`.`acompanantes`, CONSTRAINT `acompanantes_ibfk_1` FOREIGN KEY (`id_check_in`) REFERENCES `check_in` (`id_check_in`))
+[2025-10-04T15:02:18.582029500] ERR103 - Cannot add or update a child row: a foreign key constraint fails (`hotel`.`acompanantes`, CONSTRAINT `acompanantes_ibfk_1` FOREIGN KEY (`id_check_in`) REFERENCES `check_in` (`id_check_in`))
+[2025-10-04T15:02:30.503828600] ERR103 - Cannot add or update a child row: a foreign key constraint fails (`hotel`.`acompanantes`, CONSTRAINT `acompanantes_ibfk_1` FOREIGN KEY (`id_check_in`) REFERENCES `check_in` (`id_check_in`))
+[2025-10-04T15:02:55.526103300] ERR103 - Cannot add or update a child row: a foreign key constraint fails (`hotel`.`acompanantes`, CONSTRAINT `acompanantes_ibfk_1` FOREIGN KEY (`id_check_in`) REFERENCES `check_in` (`id_check_in`))
+[2025-10-04T15:06:51.070694500] ERR103 - Cannot add or update a child row: a foreign key constraint fails (`hotel`.`acompanantes`, CONSTRAINT `acompanantes_ibfk_1` FOREIGN KEY (`id_check_in`) REFERENCES `check_in` (`id_check_in`))
+[2025-10-04T15:07:14.684246600] ERR103 - Cannot add or update a child row: a foreign key constraint fails (`hotel`.`acompanantes`, CONSTRAINT `acompanantes_ibfk_1` FOREIGN KEY (`id_check_in`) REFERENCES `check_in` (`id_check_in`))
+[2025-10-04T15:19:16.357561900] ERR100 - Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+[2025-10-06T11:48:40.286989900] ERR100 - Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+[2025-10-06T11:48:55.384583400] ERR100 - Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+[2025-10-06T11:50:14.005765800] ERR100 - Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+[2025-10-06T11:50:17.524003100] ERR100 - Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+[2025-10-06T11:50:20.679790900] ERR100 - Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+[2025-10-06T11:50:24.114801700] ERR100 - Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+[2025-10-06T11:52:19.752114500] ERR100 - Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+[2025-10-06T12:25:44.363366] ERR103 - Cannot add or update a child row: a foreign key constraint fails (`hotel`.`acompanantes`, CONSTRAINT `acompanantes_ibfk_1` FOREIGN KEY (`id_check_in`) REFERENCES `check_in` (`id_check_in`))
+[2025-10-07T18:37:49.160384] ERR103 - Duplicate entry '199' for key 'clientes.PRIMARY'
+[2025-10-07T18:38:09.148961500] ERR103 - Duplicate entry '2031' for key 'clientes.PRIMARY'
+[2025-10-07T19:02:05.319931900] ERR103 - Duplicate entry '12345-1' for key 'acompanantes.Documento'

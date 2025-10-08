@@ -4,6 +4,7 @@
  */
 package IGU;
 
+import LOGICA.HabitacionesService;
 import LOGICA.HistorialManagerSingleton;
 import LOGICA.HistorialManager;
 import LOGICA.ManejadorErrores;
@@ -26,6 +27,7 @@ import java.awt.event.MouseEvent;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import LOGICA.HabitacionesService;
 
 /**
  *
@@ -36,7 +38,8 @@ public class Habitaciones extends javax.swing.JFrame {
     private int idHabitacion;
 
     // Otros componentes...
-    private javax.swing.JTextField txt_id_habitacion; // Solo si es necesario en este frame
+    private javax.swing.JTextField txt_id_habitacion;
+    HabitacionesService service = new HabitacionesService();// Solo si es necesario en este frame
 
     public Habitaciones(int idHabitacion) {
         this.idHabitacion = idHabitacion;
@@ -59,130 +62,6 @@ public class Habitaciones extends javax.swing.JFrame {
     public Image getIconImage() {
         Image retValue = Toolkit.getDefaultToolkit().getImage(ClassLoader.getSystemResource("com.images/logos.jpg"));
         return retValue;
-    }
-
-    public static void mostrarHabitacionesEnTabla(JTable tabla) {
-        DefaultTableModel model = (DefaultTableModel) tabla.getModel();
-
-        // Conectar a la base de datos
-        try (Connection conn = ConexionBD.conectar();) {
-            // Crear la consulta SQL
-            String consulta = "SELECT * FROM habitaciones";
-
-            // Limpiar la tabla antes de cargar nuevos datos
-            model.setRowCount(0);
-
-            // Crear el statement
-            try (Statement statement = conn.createStatement(); ResultSet resultSet = statement.executeQuery(consulta)) {
-
-                // Procesar los resultados y agregar filas a la tabla
-                while (resultSet.next()) {
-                    Object[] fila = {
-                        resultSet.getInt("id_habitacion"),
-                        resultSet.getString("tipo_habitacion"),
-                        resultSet.getString("nombre_habitacion"),
-                        resultSet.getDouble("precio_noche"),
-                        resultSet.getString("estado")
-
-                    };
-                    model.addRow(fila);
-                }
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    public static void marcarHabitacionEnMantenimiento(int idHabitacion) {
-        String sql = "UPDATE habitaciones SET estado = 'Mantenimiento' WHERE id_habitacion = ?";
-
-        try (Connection conn = ConexionBD.conectar(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, idHabitacion);
-            int filasAfectadas = stmt.executeUpdate();
-
-            if (filasAfectadas > 0) {
-                JOptionPane.showMessageDialog(null, "La habitación ha sido marcada como 'mantenimiento'.");
-            } else {
-                JOptionPane.showMessageDialog(null, "No se encontró la habitación con ID: " + idHabitacion);
-            }
-
-        } catch (SQLException e) {
-            ManejadorErrores.errorUpdateSQL(e);
-        }
-    }
-    
-    public static void marcarHabitacionLibre(int idHabitacion) {
-        String sql = "UPDATE habitaciones SET estado = 'Libre' WHERE id_habitacion = ?";
-
-        try (Connection conn = ConexionBD.conectar(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, idHabitacion);
-            int filasAfectadas = stmt.executeUpdate();
-
-            if (filasAfectadas > 0) {
-                JOptionPane.showMessageDialog(null, "La habitación ha sido marcada como 'Libre'.");
-            } else {
-                JOptionPane.showMessageDialog(null, "No se encontró la habitación con ID: " + idHabitacion);
-            }
-
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(null, "Error al actualizar el estado de la habitación: " + e.getMessage());
-        }
-    }
-
-    public static void agregarMenuContextual(JTable tabla) {
-        tabla.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    mostrarMenu(e);
-                }
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    mostrarMenu(e);
-                }
-            }
-
-            private void mostrarMenu(MouseEvent e) {
-                int filaSeleccionada = tabla.rowAtPoint(e.getPoint());
-                if (filaSeleccionada != -1) {
-                    tabla.setRowSelectionInterval(filaSeleccionada, filaSeleccionada);
-                    JPopupMenu menu = new JPopupMenu();
-                    JMenuItem marcarMantenimiento = new JMenuItem("Marcar como Mantenimiento");
-                    JMenuItem marcarLibre = new JMenuItem("Marcar como Libre");
-
-                    marcarMantenimiento.addActionListener(a -> {
-                        int idHabitacion = (int) tabla.getValueAt(filaSeleccionada, 0);
-
-                        marcarHabitacionEnMantenimiento(idHabitacion); // método que ya tienes
-
-                        // Registrar en historial
-                        HistorialManager historial_acciones = HistorialManagerSingleton.getInstancia();
-                        historial_acciones.registrarAccion("Habitación marcada en mantenimiento: " + idHabitacion);
-                    });
-                    
-                    marcarLibre.addActionListener(a -> {
-                        int idHabitacion = (int) tabla.getValueAt(filaSeleccionada, 0);
-
-                        marcarHabitacionLibre(idHabitacion); // método que ya tienes
-
-                        // Registrar en historial
-                        HistorialManager historial_acciones = HistorialManagerSingleton.getInstancia();
-                        historial_acciones.registrarAccion("Habitación marcada como Libre: " + idHabitacion);
-                    });
-                    
-                    
-
-                    menu.add(marcarMantenimiento);
-                    menu.add(marcarLibre);
-                    menu.show(tabla, e.getX(), e.getY());
-                }
-            }
-        });
     }
 
     @SuppressWarnings("unchecked")
@@ -295,15 +174,16 @@ public class Habitaciones extends javax.swing.JFrame {
 
     private void btn_actualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_actualizarActionPerformed
         // TODO add your handling code here:
-        mostrarHabitacionesEnTabla(jtable_habitaciones);
-        Tablas.aplicarEstilosTabla(jtable_habitaciones, new Font("Georgia", Font.PLAIN, 12), Color.BLACK, Color.LIGHT_GRAY);
-
+       service.mostrarHabitacionesEnTabla(jtable_habitaciones);
+    Tablas.aplicarEstilosTabla(jtable_habitaciones, new Font("Georgia", Font.PLAIN, 12), Color.BLACK, Color.LIGHT_GRAY);
     }//GEN-LAST:event_btn_actualizarActionPerformed
 
     private void jtable_habitacionesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jtable_habitacionesMouseClicked
         // TODO add your handling code here:
-        agregarMenuContextual(jtable_habitaciones);
-    }//GEN-LAST:event_jtable_habitacionesMouseClicked
+ int fila = jtable_habitaciones.getSelectedRow();
+    if (fila != -1) {
+    service.agregarMenuContextual(jtable_habitaciones);
+    }    }//GEN-LAST:event_jtable_habitacionesMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
