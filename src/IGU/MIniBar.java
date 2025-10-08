@@ -3,11 +3,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package IGU;
-
-/**
- *
- * @author elian
- */
+import LOGICA.Consumo_Minibar;
+import LOGICA.Tablas;
+import java.awt.Color;
+import java.awt.Font;
 public class MIniBar extends javax.swing.JFrame {
 
     /**
@@ -15,6 +14,8 @@ public class MIniBar extends javax.swing.JFrame {
      */
     public MIniBar() {
         initComponents();
+        Tablas.CentrarEncabezados(jtable_productos);
+        Tablas.aplicarEstilosTabla(jtable_productos, new Font("Georgia", Font.PLAIN, 12), Color.BLACK, Color.LIGHT_GRAY);
     }
 
     /**
@@ -33,7 +34,7 @@ public class MIniBar extends javax.swing.JFrame {
         cmb_clientes = new javax.swing.JComboBox<>();
         btn_calcular = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        jtable_productos = new javax.swing.JTable();
         btn_enviar = new javax.swing.JButton();
         txt_total_cuenta = new javax.swing.JTextField();
         lb_buscar_cliente = new javax.swing.JLabel();
@@ -90,18 +91,28 @@ public class MIniBar extends javax.swing.JFrame {
             }
         });
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        jtable_productos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Id", "Producto", "Valor Uni", "Cantidad"
             }
-        ));
-        jScrollPane1.setViewportView(jTable1);
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(jtable_productos);
+        if (jtable_productos.getColumnModel().getColumnCount() > 0) {
+            jtable_productos.getColumnModel().getColumn(0).setPreferredWidth(15);
+            jtable_productos.getColumnModel().getColumn(2).setPreferredWidth(45);
+            jtable_productos.getColumnModel().getColumn(3).setPreferredWidth(15);
+        }
 
         btn_enviar.setBackground(new java.awt.Color(65, 104, 163));
         btn_enviar.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
@@ -196,6 +207,7 @@ public class MIniBar extends javax.swing.JFrame {
         jLabel13.setText("Datos Cliente");
 
         cmb_productos.setBackground(new java.awt.Color(255, 255, 255));
+        cmb_productos.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Aguardiente", "Ron" }));
         cmb_productos.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(0, 0, 0)));
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -228,25 +240,24 @@ public class MIniBar extends javax.swing.JFrame {
                                         .addComponent(cmb_clientes, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                     .addGap(30, 30, 30))
                                 .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 310, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(jPanel1Layout.createSequentialGroup()
-                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jLabel6)
-                                        .addComponent(jLabel8)
-                                        .addComponent(jLabel11)
-                                        .addComponent(jLabel12))
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(txt_cant, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                            .addComponent(txt_id_prod, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                            .addComponent(lb_buscar_id))
-                                        .addComponent(txt_valor, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(cmb_productos, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addComponent(btn_adicionar, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 310, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jLabel3)))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel6)
+                                    .addComponent(jLabel8)
+                                    .addComponent(jLabel11)
+                                    .addComponent(jLabel12))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txt_cant, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(txt_id_prod, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(lb_buscar_id))
+                                    .addComponent(txt_valor, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(cmb_productos, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(btn_adicionar, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 310, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel3))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(btn_enviar, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -270,8 +281,8 @@ public class MIniBar extends javax.swing.JFrame {
                 .addGap(35, 35, 35)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 228, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(21, 21, 21)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(btn_calcular, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel2)
@@ -349,6 +360,7 @@ public class MIniBar extends javax.swing.JFrame {
 
     private void btn_adicionarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_adicionarActionPerformed
         // TODO add your handling code here:
+        Consumo_Minibar.agregarConsumo(txt_id_prod, cmb_productos, txt_valor, txt_cant, jtable_productos);
     }//GEN-LAST:event_btn_adicionarActionPerformed
 
     private void lb_buscar_clienteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lb_buscar_clienteMouseClicked
@@ -414,7 +426,7 @@ public class MIniBar extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable jtable_productos;
     private javax.swing.JLabel lb_buscar_cliente;
     private javax.swing.JLabel lb_buscar_id;
     private javax.swing.JTextField txt_cant;

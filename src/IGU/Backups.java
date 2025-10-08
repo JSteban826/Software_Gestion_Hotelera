@@ -111,7 +111,7 @@ public class Backups extends javax.swing.JFrame {
                     throw new IOException("mysqldump no encontrado en PATH");
                 }
 
-                lbl_status.setText("✅ Backup realizado con éxito");
+                lbl_status.setText("Backup realizado con éxito");
 
             } catch (IOException e1) {
                 // --- 2. Si falla, intentar con ruta absoluta ---
@@ -130,9 +130,9 @@ public class Backups extends javax.swing.JFrame {
                 int resultado = proceso.waitFor();
 
                 if (resultado == 0) {
-                    lbl_status.setText("✅ Backup realizado con éxito");
+                    lbl_status.setText("Backup realizado con éxito");
                 } else {
-                    lbl_status.setText("❌ Error al realizar el backup. Código: " + resultado);
+                    lbl_status.setText("Error al realizar el backup. Código: " + resultado);
                     throw new BackupException("Error al generar backup con ruta absoluta");
                 }
             }
@@ -157,7 +157,7 @@ public class Backups extends javax.swing.JFrame {
     }
 
     public void generarBackupAsync() {
-        lbl_status.setText("⏳ Realizando backup, por favor espera...");
+        lbl_status.setText("Realizando backup, por favor espera...");
 
         // Configuración inicial de la barra
         ProgressBar_backup.setVisible(true);
@@ -260,13 +260,13 @@ public class Backups extends javax.swing.JFrame {
 
                     int exitCode = proceso.waitFor();
                     if (exitCode == 0) {
-                        publish("✅ Restauración finalizada con éxito");
+                        publish("Restauración finalizada con éxito");
                     } else {
-                        publish("❌ Error en la restauración");
+                        publish("Error en la restauración");
                     }
 
                 } catch (Exception e) {
-                    publish("⚠️ Error: " + e.getMessage());
+                    publish("Error: " + e.getMessage());
                     e.printStackTrace();
                 }
                 return null;
@@ -291,48 +291,32 @@ public class Backups extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        btn_generar = new javax.swing.JButton();
-        btn_restaurar = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         listaBackups = new javax.swing.JList<>();
         lbl_status = new javax.swing.JLabel();
-        btn_refrescar = new javax.swing.JButton();
         ProgressBar_backup = new javax.swing.JProgressBar();
-        lbl_status2 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
+        lbl_status2 = new javax.swing.JLabel();
+        btn_generar = new javax.swing.JButton();
+        btn_restaurar = new javax.swing.JButton();
+        btn_refrescar = new javax.swing.JButton();
+        lbl_info = new javax.swing.JLabel();
+        lbl_progress = new javax.swing.JLabel();
+        lbl = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
 
-        btn_generar.setText("Generar");
-        btn_generar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_generarActionPerformed(evt);
-            }
-        });
-
-        btn_restaurar.setText("Restaurar");
-        btn_restaurar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_restaurarActionPerformed(evt);
-            }
-        });
-
+        listaBackups.setBackground(new java.awt.Color(204, 204, 204));
         jScrollPane1.setViewportView(listaBackups);
 
-        lbl_status.setText("Generar backup");
+        lbl_status.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
+        lbl_status.setForeground(new java.awt.Color(65, 104, 163));
+        lbl_status.setText("Presione para Generar Backup");
 
-        btn_refrescar.setText("Refrescar");
-        btn_refrescar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_refrescarActionPerformed(evt);
-            }
-        });
-
+        ProgressBar_backup.setBackground(new java.awt.Color(204, 204, 204));
         ProgressBar_backup.setForeground(new java.awt.Color(51, 153, 255));
-
-        lbl_status2.setText("Presione para Restaurar la copia de seguridad");
 
         jLabel9.setBackground(new java.awt.Color(225, 225, 191));
         jLabel9.setFont(new java.awt.Font("Georgia", 3, 24)); // NOI18N
@@ -341,30 +325,86 @@ public class Backups extends javax.swing.JFrame {
         jLabel9.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/images/logo50.jpg"))); // NOI18N
         jLabel9.setText("BACKUPS");
 
+        lbl_status2.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
+        lbl_status2.setForeground(new java.awt.Color(65, 104, 163));
+        lbl_status2.setText("Presione para Restaurar la copia de seguridad");
+
+        btn_generar.setBackground(new java.awt.Color(65, 104, 163));
+        btn_generar.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
+        btn_generar.setForeground(new java.awt.Color(255, 255, 255));
+        btn_generar.setText("Generar");
+        btn_generar.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        btn_generar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_generarActionPerformed(evt);
+            }
+        });
+
+        btn_restaurar.setBackground(new java.awt.Color(65, 104, 163));
+        btn_restaurar.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
+        btn_restaurar.setForeground(new java.awt.Color(255, 255, 255));
+        btn_restaurar.setText("Restaurar");
+        btn_restaurar.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        btn_restaurar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_restaurarActionPerformed(evt);
+            }
+        });
+
+        btn_refrescar.setBackground(new java.awt.Color(65, 104, 163));
+        btn_refrescar.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
+        btn_refrescar.setForeground(new java.awt.Color(255, 255, 255));
+        btn_refrescar.setText("Refrescar");
+        btn_refrescar.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        btn_refrescar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_refrescarActionPerformed(evt);
+            }
+        });
+
+        lbl_info.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
+        lbl_info.setForeground(new java.awt.Color(65, 104, 163));
+        lbl_info.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lbl_info.setText("Lista de Backups");
+
+        lbl_progress.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
+        lbl_progress.setForeground(new java.awt.Color(65, 104, 163));
+        lbl_progress.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lbl_progress.setText("Progreso:");
+
+        lbl.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
+        lbl.setForeground(new java.awt.Color(65, 104, 163));
+        lbl.setText("Presione para Refrescar la lista de Backups");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(93, 93, 93)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(140, 140, 140)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(lbl_info, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGap(0, 92, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(btn_refrescar, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(btn_generar, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lbl_progress, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btn_restaurar, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 502, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(btn_refrescar)
-                        .addGap(18, 18, 18)
-                        .addComponent(btn_restaurar)
-                        .addGap(18, 18, 18)
-                        .addComponent(lbl_status2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(btn_generar)
-                        .addGap(31, 31, 31)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lbl_status, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(ProgressBar_backup, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE)))))
-                .addContainerGap(84, Short.MAX_VALUE))
-            .addComponent(jLabel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lbl_status2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lbl, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lbl_status, javax.swing.GroupLayout.PREFERRED_SIZE, 401, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(ProgressBar_backup, javax.swing.GroupLayout.PREFERRED_SIZE, 360, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(75, 75, 75))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -372,28 +412,35 @@ public class Backups extends javax.swing.JFrame {
                 .addGap(20, 20, 20)
                 .addComponent(jLabel9)
                 .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btn_generar)
-                    .addComponent(lbl_status, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(ProgressBar_backup, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(49, 49, 49)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lbl_info)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btn_refrescar)
-                    .addComponent(btn_restaurar)
-                    .addComponent(lbl_status2, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(117, Short.MAX_VALUE))
+                    .addComponent(btn_generar, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbl_status))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lbl_progress)
+                    .addComponent(ProgressBar_backup, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btn_restaurar, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbl_status2))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btn_refrescar, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lbl))
+                .addContainerGap(92, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -406,6 +453,11 @@ public class Backups extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btn_generarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_generarActionPerformed
+        // TODO add your handling code here:
+        generarBackupAsync();
+    }//GEN-LAST:event_btn_generarActionPerformed
 
     private void btn_restaurarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_restaurarActionPerformed
         // TODO add your handling code here:
@@ -425,11 +477,6 @@ public class Backups extends javax.swing.JFrame {
             restaurarBackup(selectedBackup);
         }
     }//GEN-LAST:event_btn_restaurarActionPerformed
-
-    private void btn_generarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_generarActionPerformed
-        // TODO add your handling code here:   
-        generarBackupAsync();
-    }//GEN-LAST:event_btn_generarActionPerformed
 
     private void btn_refrescarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_refrescarActionPerformed
         // TODO add your handling code here:
@@ -489,6 +536,9 @@ public class Backups extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lbl;
+    private javax.swing.JLabel lbl_info;
+    private javax.swing.JLabel lbl_progress;
     private javax.swing.JLabel lbl_status;
     private javax.swing.JLabel lbl_status2;
     private javax.swing.JList<String> listaBackups;
