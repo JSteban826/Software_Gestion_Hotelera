@@ -3,10 +3,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package IGU;
+
 import LOGICA.Consumo_Minibar;
 import LOGICA.Tablas;
 import java.awt.Color;
 import java.awt.Font;
+
 public class MIniBar extends javax.swing.JFrame {
 
     /**
@@ -16,6 +18,12 @@ public class MIniBar extends javax.swing.JFrame {
         initComponents();
         Tablas.CentrarEncabezados(jtable_productos);
         Tablas.aplicarEstilosTabla(jtable_productos, new Font("Georgia", Font.PLAIN, 12), Color.BLACK, Color.LIGHT_GRAY);
+        cargarDatosProductos();
+    }
+
+    private void cargarDatosProductos() {
+        Consumo_Minibar cm = new Consumo_Minibar();
+        cm.cargarProductosEnComboBox(txt_id_prod, cmb_productos, txt_valor);
     }
 
     /**
@@ -207,7 +215,6 @@ public class MIniBar extends javax.swing.JFrame {
         jLabel13.setText("Datos Cliente");
 
         cmb_productos.setBackground(new java.awt.Color(255, 255, 255));
-        cmb_productos.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Aguardiente", "Ron" }));
         cmb_productos.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(0, 0, 0)));
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -369,6 +376,7 @@ public class MIniBar extends javax.swing.JFrame {
 
     private void lb_buscar_idMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lb_buscar_idMouseClicked
         // TODO add your handling code here:
+       
     }//GEN-LAST:event_lb_buscar_idMouseClicked
 
     /**
