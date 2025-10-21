@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 
@@ -98,6 +99,7 @@ public class Backups extends javax.swing.JFrame {
                         "-h", "database-hotel.mysql.database.azure.com",
                         "-u", ConexionBD.USUARIO,
                         "-p" + ConexionBD.CONTRASEÑA,
+                        
                         "hotel"
                 );
 
@@ -120,6 +122,7 @@ public class Backups extends javax.swing.JFrame {
                         "-h", "database-hotel.mysql.database.azure.com",
                         "-u", ConexionBD.USUARIO,
                         "-p" + ConexionBD.CONTRASEÑA,
+                        
                         "hotel"
                 );
 
@@ -220,24 +223,21 @@ public class Backups extends javax.swing.JFrame {
     }
 
     private void restaurarBackup(String nombreBackup) {
-        SwingWorker<Void, String> worker = new SwingWorker<Void, String>() {
+        SwingWorker<Void, String> worker = new SwingWorker<>() {
             @Override
-            protected Void doInBackground() throws Exception {
-                publish("⏳ Espera, restauración de copia de seguridad en curso...");
+            protected Void doInBackground() {
+                publish("⏳ Restaurando copia de seguridad, por favor espera...");
 
                 try {
-                    String rutaMysql = "C:\\Program Files\\MySQL\\MySQL Server 8.0\\bin\\mysql.exe";
-
-                    // Carpeta de backups
                     File carpetaBackups = new File("BackupsHotel");
-
-                    // Archivo dentro de la carpeta
                     File archivoBackup = new File(carpetaBackups, nombreBackup);
 
                     if (!archivoBackup.exists()) {
-                        publish("⚠️ Error: No se encontró el archivo " + archivoBackup.getAbsolutePath());
+                        publish("⚠️ No se encontró el archivo: " + archivoBackup.getAbsolutePath());
                         return null;
                     }
+
+                    String rutaMysql = "C:\\Program Files\\MySQL\\MySQL Server 8.0\\bin\\mysql.exe";
 
                     ProcessBuilder pb = new ProcessBuilder(
                             rutaMysql,
@@ -247,33 +247,43 @@ public class Backups extends javax.swing.JFrame {
                             "hotel"
                     );
 
+                    // ✅ Ejecutar el backup como entrada
                     pb.redirectInput(archivoBackup);
                     pb.redirectErrorStream(true);
 
                     Process proceso = pb.start();
 
-                    BufferedReader br = new BufferedReader(new InputStreamReader(proceso.getInputStream()));
-                    String linea;
-                    while ((linea = br.readLine()) != null) {
-                        System.out.println(linea);
+                    try (BufferedReader br = new BufferedReader(new InputStreamReader(proceso.getInputStream()))) {
+                        String linea;
+                        while ((linea = br.readLine()) != null) {
+                            System.out.println(linea);
+                        }
                     }
 
                     int exitCode = proceso.waitFor();
+
                     if (exitCode == 0) {
-                        publish("Restauración finalizada con éxito");
+                        publish("✅ Restauración completada correctamente.");
+                        // 🔄 Refrescar vista o datos
+                        SwingUtilities.invokeLater(() -> {
+                            // Aquí llamas tu método para recargar datos desde la BD
+                            // Ejemplo:
+                            // cargarDatosTabla();
+                        });
                     } else {
-                        publish("Error en la restauración");
+                        publish("❌ Error al restaurar la base de datos. Código: " + exitCode);
                     }
 
                 } catch (Exception e) {
-                    publish("Error: " + e.getMessage());
+                    publish("⚠️ Error en la restauración: " + e.getMessage());
                     e.printStackTrace();
                 }
+
                 return null;
             }
 
             @Override
-            protected void process(java.util.List<String> chunks) {
+            protected void process(List<String> chunks) {
                 lbl_status2.setText(chunks.get(chunks.size() - 1));
             }
         };

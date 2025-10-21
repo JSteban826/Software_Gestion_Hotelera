@@ -49,9 +49,10 @@ public class Reserva extends javax.swing.JFrame {
         setDefaultCloseOperation(Reserva.DISPOSE_ON_CLOSE); // <-- AQUÍ
         setResizable(false);
         Tablas.CentrarEncabezados(jtable_reservas);
+        Tablas.aplicarEstilosTabla(jtable_reservas, new Font("Georgia", Font.PLAIN, 12), Color.BLACK, Color.LIGHT_GRAY);
         int nuevoId = Reserva.obtenerSiguienteIdReserva();
         txt_id_reserva.setText(String.valueOf(nuevoId)); // txtIdReserva es tu JTextField
-
+        Reservas.mostrarReservasEnTabla(jtable_reservas);
         cargarHabitacionesEnComboBox();
 
     }
@@ -826,7 +827,7 @@ public class Reserva extends javax.swing.JFrame {
             HistorialManager historial_acciones = HistorialManagerSingleton.getInstancia();
             historial_acciones.registrarAccion("Ticket del cliente: " + nombre + " generada");
 
-         } catch (Exception ex) {
+        } catch (Exception ex) {
             Logger.getLogger(check_out.class.getName()).log(Level.SEVERE, null, ex);
         }
 

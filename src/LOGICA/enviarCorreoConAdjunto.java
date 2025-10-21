@@ -1,13 +1,5 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package LOGICA;
 
-/**
- *
- * @author Windows
- */
 import java.util.*;
 import javax.mail.*;
 import javax.mail.internet.*;
@@ -18,14 +10,18 @@ public class enviarCorreoConAdjunto {
 
     public static void enviarCorreoConAdjunto(String destinatario, String asunto, String cuerpo, String rutaAdjunto) {
         final String emisor = "hotelbahiacoral@gmail.com";
-        final String claveApp = "yzra lhhs jnif yhme"; //
+        final String claveApp = "yzra lhhs jnif yhme";
+
+        // 🔸 Detectar idioma del sistema (puedes cambiarlo manualmente)
+        Locale locale = Locale.getDefault();
+        ResourceBundle mensajes = ResourceBundle.getBundle("mensajes", locale);
 
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.host", "smtp.gmail.com");
         props.put("mail.smtp.port", "587");
-        props.put("mail.smtp.ssl.trust", "smtp.gmail.com"); // <- Esta línea soluciona el problema
+        props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
 
         Session sesion = Session.getInstance(props, new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
@@ -54,10 +50,10 @@ public class enviarCorreoConAdjunto {
             mensaje.setContent(multipart);
 
             Transport.send(mensaje);
-            System.out.println("Correo enviado exitosamente a " + destinatario);
+            System.out.println(mensajes.getString("correo.enviado") + " " + destinatario);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(mensajes.getString("correo.error") + " " + e.getMessage());
         }
     }
 }

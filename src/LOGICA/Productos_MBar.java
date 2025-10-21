@@ -1,12 +1,12 @@
 package LOGICA;
 
-public class Productos {
+public class Productos_MBar {
 
     private String id_prod;
     private String nom_prod;
-    private int valor; // Nuevo atributo
+    private int valor; 
 
-    public Productos(String id_prod, String nom_prod, int valor) {
+    public Productos_MBar(String id_prod, String nom_prod, int valor) {
         this.id_prod = id_prod;
         this.nom_prod = nom_prod;
         this.valor = valor;

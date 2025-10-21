@@ -136,7 +136,7 @@ public class Acompañantes extends javax.swing.JFrame {
     }
 
     // Método auxiliar para cargar datos de reserva y nombre de habitación
-    private void cargarDatosCheckIn(String cedulaCliente) {
+    public void cargarDatosCheckIn(String cedulaCliente) {
         String sqlReserva = "SELECT id_check_in FROM check_in WHERE id_cliente = ?";
 
         try (java.sql.Connection conn = ConexionBD.conectar(); PreparedStatement psReserva = conn.prepareStatement(sqlReserva)) {
@@ -158,7 +158,7 @@ public class Acompañantes extends javax.swing.JFrame {
         }
     }
 
-    private void buscarClientePorCedula(String cedula) throws ClienteNoExisteException, SQLException {
+    public void buscarClientePorCedula(String cedula) throws ClienteNoExisteException, SQLException {
         String sql = "SELECT Cedula, nombre, apellido FROM clientes WHERE Cedula = ?";
 
         try (Connection conn = ConexionBD.conectar(); PreparedStatement statement = conn.prepareStatement(sql)) {
@@ -215,7 +215,7 @@ public class Acompañantes extends javax.swing.JFrame {
         txt_apellido = new javax.swing.JTextField();
         txt_telefono = new javax.swing.JTextField();
         txt_parentesco = new javax.swing.JTextField();
-        btn_ingresar = new javax.swing.JButton();
+        btn_registrar = new javax.swing.JButton();
         jLabel9 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
@@ -304,15 +304,15 @@ public class Acompañantes extends javax.swing.JFrame {
         txt_parentesco.setBackground(new java.awt.Color(204, 204, 204));
         txt_parentesco.setBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, new java.awt.Color(0, 0, 0)));
 
-        btn_ingresar.setBackground(new java.awt.Color(65, 104, 163));
-        btn_ingresar.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
-        btn_ingresar.setForeground(new java.awt.Color(255, 255, 255));
-        btn_ingresar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/images/grupo (1).png"))); // NOI18N
-        btn_ingresar.setText("REGISTRAR");
-        btn_ingresar.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        btn_ingresar.addActionListener(new java.awt.event.ActionListener() {
+        btn_registrar.setBackground(new java.awt.Color(65, 104, 163));
+        btn_registrar.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
+        btn_registrar.setForeground(new java.awt.Color(255, 255, 255));
+        btn_registrar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/images/grupo (1).png"))); // NOI18N
+        btn_registrar.setText("REGISTRAR");
+        btn_registrar.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        btn_registrar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_ingresarActionPerformed(evt);
+                btn_registrarActionPerformed(evt);
             }
         });
 
@@ -418,7 +418,7 @@ public class Acompañantes extends javax.swing.JFrame {
                                         .addComponent(lb_buscar))))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(19, 19, 19)
-                                .addComponent(btn_ingresar, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(btn_registrar, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
@@ -505,7 +505,7 @@ public class Acompañantes extends javax.swing.JFrame {
                         .addComponent(txt_parentesco, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btn_ingresar, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btn_registrar, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(12, 12, 12)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -535,7 +535,7 @@ public class Acompañantes extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btn_ingresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_ingresarActionPerformed
+    private void btn_registrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_registrarActionPerformed
         // TODO add your handling code here:
         try {
             // Validación previa de campos vacíos antes del parseo
@@ -573,7 +573,7 @@ public class Acompañantes extends javax.swing.JFrame {
         }
 
 
-    }//GEN-LAST:event_btn_ingresarActionPerformed
+    }//GEN-LAST:event_btn_registrarActionPerformed
 
     private void txt_apellidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_apellidoActionPerformed
         // TODO add your handling code here:
@@ -658,7 +658,7 @@ public class Acompañantes extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btn_ingresar;
+    private javax.swing.JButton btn_registrar;
     private javax.swing.JComboBox<String> cmb_clientes;
     private javax.swing.JEditorPane jEditorPane1;
     private javax.swing.JLabel jLabel1;

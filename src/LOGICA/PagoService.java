@@ -17,8 +17,9 @@ public class PagoService {
                 double totalUSD = totalCOP / tasaCambio;
                 String montoUSD = String.format(Locale.US, "%.2f", totalUSD);
 
+                Locale idioma = Locale.getDefault();
                 // Enviar correo con enlace de pago
-                CorreoPago.enviarCorreo(correo, montoUSD);
+                CorreoPago.enviarCorreo(correo, montoUSD, idioma);
                 JOptionPane.showMessageDialog(null,
                         "Correo enviado con el enlace de pago en dólares.",
                         "Correo Enviado", JOptionPane.INFORMATION_MESSAGE);
@@ -37,12 +38,6 @@ public class PagoService {
 
             // Insertar el pago en la BD
             accionInsertarPago.run();
-
-        } catch (CorreoNoEnviadoException e) {
-            ManejadorErrores.enviarEnlace(e);
-            JOptionPane.showMessageDialog(null,
-                    "No se pudo enviar el correo: " + e.getMessage(),
-                    "Error de Correo", JOptionPane.ERROR_MESSAGE);
 
         } catch (Exception e) {
             ManejadorErrores.errorDesconocido(e);
