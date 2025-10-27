@@ -14,7 +14,7 @@ public class enviarCorreoConAdjunto {
 
         // 🔸 Detectar idioma del sistema (puedes cambiarlo manualmente)
         Locale locale = Locale.getDefault();
-        ResourceBundle mensajes = ResourceBundle.getBundle("mensajes", locale);
+        ResourceBundle mensajes = ResourceBundle.getBundle("LOGICA.mensajes", locale);
 
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");

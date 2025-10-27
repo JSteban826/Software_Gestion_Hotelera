@@ -1,6 +1,7 @@
 package LOGICA;
 
 import static LOGICA.enviarCorreoConAdjunto.enviarCorreoConAdjunto;
+import PERSISTENCIA.ConexionBD;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
@@ -14,6 +15,7 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import java.io.File;
+import java.sql.*;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -28,6 +30,7 @@ public class TicketPDFService {
         public Date fechaEntrada;
         public Date fechaSalida;
         public String correo;
+        public String metodoPago; // 💳 nuevo campo
     }
 
     public static class ParametrosCheckOut {
@@ -39,6 +42,7 @@ public class TicketPDFService {
         public String diasEstancia;
         public String valorTotal;
         public boolean minibar, restaurante, spa, habitacion;
+        public String metodoPago; // 💳 nuevo campo
     }
 
     public static void generarFacturaReserva(ParametrosReserva pr) throws Exception {
@@ -74,6 +78,8 @@ public class TicketPDFService {
         tabla.addCell(getCeldaValorTabla(new SimpleDateFormat("yyyy-MM-dd").format(pr.fechaEntrada)));
         tabla.addCell(getCeldaServicioTabla("Fecha Salida:"));
         tabla.addCell(getCeldaValorTabla(new SimpleDateFormat("yyyy-MM-dd").format(pr.fechaSalida)));
+        tabla.addCell(getCeldaServicioTabla("Método de Pago:"));
+        tabla.addCell(getCeldaValorTabla(pr.metodoPago));
 
         documento.add(tabla);
         documento.close();
@@ -113,8 +119,29 @@ public class TicketPDFService {
         tabla.addCell(getCeldaValorTabla(pchk.idCheck));
         tabla.addCell(getCeldaServicioTabla("Días Estancia:"));
         tabla.addCell(getCeldaValorTabla(pchk.diasEstancia));
+        tabla.addCell(getCeldaServicioTabla("Método de Pago:"));
+        tabla.addCell(getCeldaValorTabla(pchk.metodoPago));
 
         documento.add(tabla);
+
+        double totalMinibar = 0.0;
+
+        if (pchk.minibar) {
+            String sql = "SELECT total_cuenta FROM consumo_minibar WHERE id_cliente = ? ORDER BY fecha_consumo DESC LIMIT 1";
+
+            try (Connection conn = ConexionBD.conectar(); PreparedStatement pst = conn.prepareStatement(sql)) {
+
+                pst.setString(1, pchk.idCliente);
+                try (ResultSet rs = pst.executeQuery()) {
+                    if (rs.next()) {
+                        totalMinibar = rs.getDouble("total_cuenta");
+                    }
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
         // Servicios adicionales
         PdfPTable tablaServicios = new PdfPTable(2);
@@ -123,8 +150,9 @@ public class TicketPDFService {
 
         if (pchk.minibar) {
             tablaServicios.addCell(getCeldaServicioTabla("Minibar"));
-            tablaServicios.addCell(getCeldaValorTabla("$15000"));
+            tablaServicios.addCell(getCeldaValorTabla("$" + String.format("%.2f", totalMinibar)));
         }
+
         if (pchk.restaurante) {
             tablaServicios.addCell(getCeldaServicioTabla("Restaurante"));
             tablaServicios.addCell(getCeldaValorTabla("$25000"));

@@ -54,6 +54,7 @@ public class Reserva extends javax.swing.JFrame {
         txt_id_reserva.setText(String.valueOf(nuevoId)); // txtIdReserva es tu JTextField
         Reservas.mostrarReservasEnTabla(jtable_reservas);
         cargarHabitacionesEnComboBox();
+        Reservas.mostrarReservasEnTabla(jtable_reservas);
 
     }
 
@@ -816,7 +817,7 @@ public class Reserva extends javax.swing.JFrame {
             pr.fechaEntrada = jdate_fecha_entrada.getDate();
             pr.fechaSalida = jdate_fecha_salida.getDate();
             pr.correo = obtenerCorreoCliente(pr.idCliente);
-
+            pr.metodoPago = cmb_pagos.getSelectedItem().toString(); 
             TicketPDFService.generarFacturaReserva(pr);
 
             // Obtener datos del cliente
@@ -830,6 +831,7 @@ public class Reserva extends javax.swing.JFrame {
         } catch (Exception ex) {
             Logger.getLogger(check_out.class.getName()).log(Level.SEVERE, null, ex);
         }
+
 
     }//GEN-LAST:event_btn_facturaActionPerformed
 

@@ -6,6 +6,7 @@ package IGU;
 
 import LOGICA.ClienteNoExisteException;
 import LOGICA.Consumo_Minibar;
+
 import LOGICA.ManejadorErrores;
 import LOGICA.Productos_MBar;
 import LOGICA.Tablas;
@@ -16,6 +17,7 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 public class MIniBar extends javax.swing.JFrame {
 
@@ -28,6 +30,7 @@ public class MIniBar extends javax.swing.JFrame {
         Tablas.aplicarEstilosTabla(jtable_productos, new Font("Georgia", Font.PLAIN, 12), Color.BLACK, Color.LIGHT_GRAY);
         cargarDatosProductos();
         cargarDatosClientes();
+        Consumo_Minibar.generarSiguienteIdConsumo(txt_id_consumo);
     }
 
     private void cargarDatosProductos() {
@@ -436,6 +439,14 @@ public class MIniBar extends javax.swing.JFrame {
             Timestamp fechaConsum = new Timestamp(System.currentTimeMillis());
 
             Consumo_Minibar.registrarConsumoDesdeTabla(jtable_productos, txt_id_cliente, txt_id_check, fechaConsum, txt_total_cuenta);
+
+            // Limpiar tabla
+            DefaultTableModel model = (DefaultTableModel) jtable_productos.getModel();
+            model.setRowCount(0);
+
+            // Limpiar campos
+            txt_total_cuenta.setText("");
+            Consumo_Minibar.generarSiguienteIdConsumo(txt_id_consumo);
 
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());

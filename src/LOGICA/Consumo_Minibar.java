@@ -355,4 +355,28 @@ public class Consumo_Minibar {
         }
     }
 
+    public static void generarSiguienteIdConsumo(JTextField txt_id_consumo) {
+    String nuevoId = "C0001"; // valor por defecto
+    String sql = "SELECT id_consumo FROM consumo_minibar ORDER BY id_consumo DESC LIMIT 1";
+
+    try (Connection conn = ConexionBD.conectar(); // usa tu clase de conexión
+         PreparedStatement pst = conn.prepareStatement(sql);
+         ResultSet rs = pst.executeQuery()) {
+
+        if (rs.next()) {
+            String ultimoId = rs.getString("id_consumo");
+            // extraer número después de la 'C'
+            int numero = Integer.parseInt(ultimoId.substring(1));
+            // generar nuevo ID con formato de 4 dígitos
+            nuevoId = String.format("C%04d", numero + 1);
+        }
+
+        txt_id_consumo.setText(nuevoId);
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(null, 
+            "Error al generar ID de consumo: " + e.getMessage());
+    }
+}
+    
 }

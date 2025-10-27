@@ -22,6 +22,7 @@ import java.sql.Connection;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.SQLTimeoutException;
 import java.sql.SQLTransactionRollbackException;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComboBox;
@@ -44,7 +45,7 @@ public class check_out extends javax.swing.JFrame {
     }
 
     private String serviciosSeleccionados = "";
-    private int valorTotalCalculado = 0;
+    private double valorTotalCalculado = 0;
 
     // Asegúrate de importar IGU.Cliente
     Map<String, Cliente> datosClientes = new HashMap<>();
@@ -248,40 +249,85 @@ public class check_out extends javax.swing.JFrame {
     }
 
     private void calcularServiciosSeleccionados() {
-        int total = 0;
-
-        // Precios por servicio
-        int precioMinibar = 15000;
-        int precioRestaurante = 25000;
-        int precioSpa = 40000;
-        int precioDaño = 80000;
+        // Usamos double para poder manejar decimales (minibar puede tener .xx)
+        double totalGeneral = 0.0;
 
         // Construir string de servicios seleccionados
         StringBuilder servicios = new StringBuilder();
 
+        double totalMinibar = 0.0;
+
+        // Si está marcado minibar, consultamos la BD y obtenemos su total
         if (chk_minibar.isSelected()) {
-            total += precioMinibar;
+            String idCliente = txt_id_cliente_chk.getText().trim();
+
+            if (idCliente.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Debe ingresar o seleccionar un cliente antes de consultar el minibar.");
+                return;
+            }
+
+            String sql = "SELECT total_cuenta FROM consumo_minibar WHERE id_cliente = ? ORDER BY fecha_consumo DESC LIMIT 1";
+
+            try (Connection conn = ConexionBD.conectar(); PreparedStatement pst = conn.prepareStatement(sql)) {
+
+                pst.setString(1, idCliente);
+
+                try (ResultSet rs = pst.executeQuery()) {
+                    if (rs.next()) {
+                        totalMinibar = rs.getDouble("total_cuenta"); // aquí queda asignado el valor del SQL
+                    } else {
+                        // No hay consumos: totalMinibar queda en 0.0
+                        // opcional: informar al usuario
+                        // JOptionPane.showMessageDialog(null, "No hay consumos registrados para este cliente.");
+                    }
+                }
+
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null, "Error al obtener el consumo del minibar: " + e.getMessage());
+                e.printStackTrace();
+            }
+
+            // añadimos el servicio a la lista
             servicios.append("Minibar, ");
         }
+
+        // Precios por servicio (constantes)
+        int precioRestaurante = 25000;
+        int precioSpa = 40000;
+        int precioDaño = 80000;
+
+        // Sumamos los servicios fijos a totalGeneral
         if (chk_restaurante.isSelected()) {
-            total += precioRestaurante;
+            totalGeneral += precioRestaurante;
             servicios.append("Restaurante, ");
         }
         if (chk_spa.isSelected()) {
-            total += precioSpa;
+            totalGeneral += precioSpa;
             servicios.append("Spa, ");
         }
         if (chk_habitacion.isSelected()) {
-            total += precioDaño;
+            totalGeneral += precioDaño;
             servicios.append("Daño Habitación, ");
         }
 
-        // Mostrar total
-        txt_Valor_total.setText(String.valueOf(total));
+        // Finalmente sumamos el minibar (si aplica)
+        totalGeneral += totalMinibar;
+
+        // Mostrar total (con 2 decimales, punto decimal)
+        txt_Valor_total.setText(String.format(Locale.US, "%.2f", totalGeneral));
 
         // Guardar string de servicios para usarlo al insertar
         serviciosSeleccionados = servicios.toString();
-        valorTotalCalculado = total;
+
+        // Si tu variable valorTotalCalculado es int, castearla; pero recomiendo que sea double
+        // Aquí la pongo como double si existe, si no, cámbialo a tu variable real
+        try {
+            // Si valorTotalCalculado es double:
+            valorTotalCalculado = totalGeneral;
+        } catch (Exception ex) {
+            // Si valorTotalCalculado es int en tu código legacy:
+            // valorTotalCalculado = (int) Math.round(totalGeneral);
+        }
     }
 
     public static int obtenerSiguienteIdCheck() {
@@ -734,6 +780,7 @@ public class check_out extends javax.swing.JFrame {
             pchk.restaurante = chk_restaurante.isSelected();
             pchk.spa = chk_spa.isSelected();
             pchk.habitacion = chk_habitacion.isSelected();
+            pchk.metodoPago = cmb_pagos.getSelectedItem().toString(); // 💳 mover arriba
 
             TicketPDFService.generarFacturaCheckOut(pchk);
 
@@ -742,6 +789,7 @@ public class check_out extends javax.swing.JFrame {
             //Agregar Accion a Historial
             HistorialManager historial_acciones = HistorialManagerSingleton.getInstancia();
             historial_acciones.registrarAccion("Ticket del cliente: " + nombre + " generada");
+
         } catch (Exception ex) {
             Logger.getLogger(check_out.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -815,7 +863,9 @@ public class check_out extends javax.swing.JFrame {
             ManejadorErrores.clienteNoExiste(ex);
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, "Error al buscar el cliente en la base de datos.");
-            Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, "Error SQL al buscar cliente", ex);
+            Logger
+                    .getLogger(Clientes.class
+                            .getName()).log(Level.SEVERE, "Error SQL al buscar cliente", ex);
         }
 
     }//GEN-LAST:event_lb_buscarMouseClicked
@@ -838,16 +888,24 @@ public class check_out extends javax.swing.JFrame {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
+
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(check_out.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(check_out.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(check_out.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(check_out.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(check_out.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(check_out.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(check_out.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(check_out.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
