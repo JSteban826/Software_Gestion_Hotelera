@@ -5,6 +5,9 @@ import LOGICA.HistorialManager;
 import java.awt.Toolkit;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class PRINCIPAL1 extends javax.swing.JFrame {
 
@@ -17,6 +20,8 @@ public class PRINCIPAL1 extends javax.swing.JFrame {
     Login lg;
     check_in in;
     Acompañantes ac;
+    DASHBOARD1 ds;
+    MIniBar mn;
 
     /**
      * Creates new form PRINCIPAL1
@@ -41,11 +46,11 @@ public class PRINCIPAL1 extends javax.swing.JFrame {
         habitacion.setOpaque(false);
         habitacion.setCursor(new Cursor(Cursor.HAND_CURSOR));
         //admin
-        admin.setBorderPainted(false);
-        admin.setContentAreaFilled(false);
-        admin.setFocusPainted(false);
-        admin.setOpaque(false);
-        admin.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        admin1.setBorderPainted(false);
+        admin1.setContentAreaFilled(false);
+        admin1.setFocusPainted(false);
+        admin1.setOpaque(false);
+        admin1.setCursor(new Cursor(Cursor.HAND_CURSOR));
         //check
         check_out.setBorderPainted(false);
         check_out.setContentAreaFilled(false);
@@ -64,7 +69,7 @@ public class PRINCIPAL1 extends javax.swing.JFrame {
         label_acompañantes.setFocusPainted(false);
         label_acompañantes.setOpaque(false);
         label_acompañantes.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        
+
         check.setCursor(new Cursor(Cursor.HAND_CURSOR));
         jlabel_Reserva2.setCursor(new Cursor(Cursor.HAND_CURSOR));
         jlabel_Habi.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -73,7 +78,18 @@ public class PRINCIPAL1 extends javax.swing.JFrame {
         jlabel_Salir.setCursor(new Cursor(Cursor.HAND_CURSOR));
         check_In.setCursor(new Cursor(Cursor.HAND_CURSOR));
         jLabel_Regis.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        
+        //dash
+        dashboard.setBorderPainted(false);
+        dashboard.setContentAreaFilled(false);
+        dashboard.setFocusPainted(false);
+        dashboard.setOpaque(false);
+        dashboard.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        //mini
+        minibar.setBorderPainted(false);
+        minibar.setContentAreaFilled(false);
+        minibar.setFocusPainted(false);
+        minibar.setOpaque(false);
+        minibar.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
     }
 
@@ -91,7 +107,7 @@ public class PRINCIPAL1 extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         reserva = new javax.swing.JButton();
         btn_clientes = new javax.swing.JButton();
-        admin = new javax.swing.JButton();
+        minibar = new javax.swing.JButton();
         habitacion = new javax.swing.JButton();
         check_out = new javax.swing.JButton();
         jLabel10 = new javax.swing.JLabel();
@@ -103,6 +119,10 @@ public class PRINCIPAL1 extends javax.swing.JFrame {
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
         labelchek = new javax.swing.JButton();
+        admin1 = new javax.swing.JButton();
+        dashboard = new javax.swing.JButton();
+        jLabeldash = new javax.swing.JLabel();
+        jLabelmini = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
@@ -136,6 +156,7 @@ public class PRINCIPAL1 extends javax.swing.JFrame {
             }
         });
 
+        btn_clientes.setBackground(new java.awt.Color(255, 255, 255));
         btn_clientes.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/images/clientesadd.png"))); // NOI18N
         btn_clientes.setBorder(null);
         btn_clientes.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -149,10 +170,10 @@ public class PRINCIPAL1 extends javax.swing.JFrame {
             }
         });
 
-        admin.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/images/gestion (1).png"))); // NOI18N
-        admin.addActionListener(new java.awt.event.ActionListener() {
+        minibar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/images/mini-bar.png"))); // NOI18N
+        minibar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                adminActionPerformed(evt);
+                minibarActionPerformed(evt);
             }
         });
 
@@ -189,6 +210,11 @@ public class PRINCIPAL1 extends javax.swing.JFrame {
         jLabel6.setFont(new java.awt.Font("Georgia", 3, 12)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(65, 104, 163));
         jLabel6.setText("ADMINISTRACION");
+        jLabel6.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel6MouseClicked(evt);
+            }
+        });
 
         label_acompañantes.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/images/grupo.png"))); // NOI18N
         label_acompañantes.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -222,6 +248,38 @@ public class PRINCIPAL1 extends javax.swing.JFrame {
             }
         });
 
+        admin1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/images/gestion (1).png"))); // NOI18N
+        admin1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                admin1ActionPerformed(evt);
+            }
+        });
+
+        dashboard.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/images/dashboard.png"))); // NOI18N
+        dashboard.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dashboardActionPerformed(evt);
+            }
+        });
+
+        jLabeldash.setFont(new java.awt.Font("Georgia", 3, 12)); // NOI18N
+        jLabeldash.setForeground(new java.awt.Color(65, 104, 163));
+        jLabeldash.setText("DASHBOARD");
+        jLabeldash.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabeldashMouseClicked(evt);
+            }
+        });
+
+        jLabelmini.setFont(new java.awt.Font("Georgia", 3, 12)); // NOI18N
+        jLabelmini.setForeground(new java.awt.Color(65, 104, 163));
+        jLabelmini.setText("MINI- BAR");
+        jLabelmini.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabelminiMouseClicked(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -236,26 +294,24 @@ public class PRINCIPAL1 extends javax.swing.JFrame {
                         .addGap(117, 117, 117))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(7, 7, 7)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addGroup(jPanel1Layout.createSequentialGroup()
-                                        .addComponent(habitacion)
-                                        .addGap(6, 6, 6))
-                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jLabel6)
-                                        .addComponent(admin))))
                             .addComponent(btn_clientes, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(24, 24, 24)
-                                .addComponent(jLabel12)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 89, Short.MAX_VALUE)
+                                .addComponent(jLabel12))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(7, 7, 7)
+                                .addComponent(habitacion))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel6)
+                                .addComponent(admin1)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 95, Short.MAX_VALUE)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(label_acompañantes)
                             .addComponent(reserva)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(6, 6, 6)
-                                .addComponent(jLabel11)))
+                                .addComponent(jLabel11))
+                            .addComponent(minibar))
                         .addGap(85, 85, 85)))
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
@@ -264,16 +320,26 @@ public class PRINCIPAL1 extends javax.swing.JFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel5)
                         .addGap(140, 140, 140))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(labelchek, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(117, 117, 117))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel4)
-                        .addGap(147, 147, 147))))
+                        .addGap(147, 147, 147))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(labelchek, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(dashboard)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(22, 22, 22)
+                                .addComponent(jLabeldash)))
+                        .addGap(117, 117, 117))))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(252, 252, 252)
                 .addComponent(jLabel10)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createSequentialGroup()
+                    .addGap(295, 295, 295)
+                    .addComponent(jLabelmini)
+                    .addContainerGap(390, Short.MAX_VALUE)))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -299,7 +365,8 @@ public class PRINCIPAL1 extends javax.swing.JFrame {
                         .addComponent(label_acompañantes)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(38, 38, 38))
+                        .addGap(42, 42, 42)
+                        .addComponent(minibar))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
@@ -313,11 +380,21 @@ public class PRINCIPAL1 extends javax.swing.JFrame {
                                 .addComponent(check_out, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
                                 .addComponent(jLabel5)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addComponent(admin)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(dashboard))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(admin1)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabeldash, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(8, 8, 8))
+            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                    .addContainerGap(650, Short.MAX_VALUE)
+                    .addComponent(jLabelmini, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap()))
         );
 
         jPanel2.setBackground(new java.awt.Color(65, 104, 163));
@@ -549,7 +626,7 @@ public class PRINCIPAL1 extends javax.swing.JFrame {
         historial_acciones.registrarAccion("Ingreso a Reservas");
     }//GEN-LAST:event_reservaActionPerformed
 
-    private void adminActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_adminActionPerformed
+    private void minibarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_minibarActionPerformed
         // TODO add your handling code here:
         lg = new Login();
         lg.setVisible(true);
@@ -568,7 +645,7 @@ public class PRINCIPAL1 extends javax.swing.JFrame {
         HistorialManager historial_acciones = HistorialManagerSingleton.getInstancia();
         historial_acciones.registrarAccion("Ingreso a Reservas");
 
-    }//GEN-LAST:event_adminActionPerformed
+    }//GEN-LAST:event_minibarActionPerformed
 
     private void habitacionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_habitacionActionPerformed
         // TODO add your handling code here:
@@ -721,12 +798,12 @@ public class PRINCIPAL1 extends javax.swing.JFrame {
 
     private void label_acompañantesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_label_acompañantesActionPerformed
         // TODO add your handling code here:
-        
+
     }//GEN-LAST:event_label_acompañantesActionPerformed
 
     private void check_InMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_check_InMouseClicked
         // TODO add your handling code here:
-         // TODO add your handling code here:
+        // TODO add your handling code here:
         in = new check_in();
         in.setVisible(true);
 
@@ -747,7 +824,7 @@ public class PRINCIPAL1 extends javax.swing.JFrame {
 
     private void jLabel_RegisMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel_RegisMouseClicked
         // TODO add your handling code here:
-          // TODO add your handling code here:
+        // TODO add your handling code here:
         pri = new Registro_Clientes();
         pri.setVisible(true);
 
@@ -764,17 +841,17 @@ public class PRINCIPAL1 extends javax.swing.JFrame {
         //Agregar Accion a Historial
         HistorialManager historial_acciones = HistorialManagerSingleton.getInstancia();
         historial_acciones.registrarAccion("Ingreso a Registro Clientes");
-                                       
+
     }//GEN-LAST:event_jLabel_RegisMouseClicked
 
     private void labelchekActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_labelchekActionPerformed
         // TODO add your handling code here:
-        
+
     }//GEN-LAST:event_labelchekActionPerformed
 
     private void label_acompañantesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_label_acompañantesMouseClicked
         // TODO add your handling code here:
-         // TODO add your handling code here:
+        // TODO add your handling code here:
         ac = new Acompañantes();
         ac.setVisible(true);
 
@@ -795,7 +872,7 @@ public class PRINCIPAL1 extends javax.swing.JFrame {
 
     private void labelchekMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_labelchekMouseClicked
         // TODO add your handling code here:
-                in = new check_in();
+        in = new check_in();
         in.setVisible(true);
 
         in.setResizable(false);
@@ -812,6 +889,64 @@ public class PRINCIPAL1 extends javax.swing.JFrame {
         HistorialManager historial_acciones = HistorialManagerSingleton.getInstancia();
         historial_acciones.registrarAccion("Ingreso a Check In");
     }//GEN-LAST:event_labelchekMouseClicked
+
+    private void admin1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_admin1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_admin1ActionPerformed
+
+    private void dashboardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dashboardActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_dashboardActionPerformed
+
+    private void jLabel6MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel6MouseClicked
+        // TODO add your handling code here:
+        mn = new MIniBar();
+        mn.setVisible(true);
+
+        mn.setResizable(false);
+        Dimension pantalla = Toolkit.getDefaultToolkit().getScreenSize();
+
+        // Calcular la posición para centrar el JFrame
+        int x = (pantalla.width - mn.getSize().width) / 2;
+        int y = (pantalla.height - mn.getSize().height) / 2;
+
+        // Posicionar la ventana en el centro de la pantalla
+        in.setLocation(x, y);
+
+        //Agregar Accion a Historial
+        HistorialManager historial_acciones = HistorialManagerSingleton.getInstancia();
+        historial_acciones.registrarAccion("Ingreso a  Mini Bar");
+    }//GEN-LAST:event_jLabel6MouseClicked
+
+    private void jLabelminiMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabelminiMouseClicked
+        // TODO add your handling code here:
+
+    }//GEN-LAST:event_jLabelminiMouseClicked
+
+    private void jLabeldashMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabeldashMouseClicked
+        try {
+            // TODO add your handling code here:
+
+            ds = new DASHBOARD1();
+        } catch (SQLException ex) {
+            Logger.getLogger(PRINCIPAL1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        ds.setVisible(true);
+
+        ds.setResizable(false);
+        Dimension pantalla = Toolkit.getDefaultToolkit().getScreenSize();
+
+        // Calcular la posición para centrar el JFrame
+        int x = (pantalla.width - ds.getSize().width) / 2;
+        int y = (pantalla.height - ds.getSize().height) / 2;
+
+        // Posicionar la ventana en el centro de la pantalla
+        ds.setLocation(x, y);
+
+        //Agregar Accion a Historial
+        HistorialManager historial_acciones = HistorialManagerSingleton.getInstancia();
+        historial_acciones.registrarAccion("Ingreso a Mini Bar");
+    }//GEN-LAST:event_jLabeldashMouseClicked
 
     /**
      * @param args the command line arguments
@@ -850,11 +985,12 @@ public class PRINCIPAL1 extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel acompa;
-    private javax.swing.JButton admin;
+    private javax.swing.JButton admin1;
     private javax.swing.JButton btn_clientes;
     private javax.swing.JLabel check;
     private javax.swing.JLabel check_In;
     private javax.swing.JButton check_out;
+    private javax.swing.JButton dashboard;
     private javax.swing.JButton habitacion;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -869,6 +1005,8 @@ public class PRINCIPAL1 extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JLabel jLabel_Regis;
+    private javax.swing.JLabel jLabeldash;
+    private javax.swing.JLabel jLabelmini;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -878,6 +1016,7 @@ public class PRINCIPAL1 extends javax.swing.JFrame {
     private javax.swing.JLabel jlabel_Salir;
     private javax.swing.JButton label_acompañantes;
     private javax.swing.JButton labelchek;
+    private javax.swing.JButton minibar;
     private javax.swing.JButton reserva;
     // End of variables declaration//GEN-END:variables
 }

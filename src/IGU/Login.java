@@ -21,6 +21,9 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import java.sql.Timestamp;
+
+import LOGICA.RegistroBloqueos;
 
 public class Login extends javax.swing.JFrame {
 
@@ -39,18 +42,80 @@ public class Login extends javax.swing.JFrame {
         return retValue;
     }
 
-    public static String validarLogin(String usuario, String contraseña) throws SQLTransactionRollbackException, SQLTimeoutException, SQLException {
-        String sql = "SELECT r.nombre AS rol FROM usuarios u JOIN roles r ON u.rol_id = r.id WHERE u.usuario = ? AND u.contraseña = ?";
-        try (Connection conn = ConexionBD.conectar(); PreparedStatement statement = conn.prepareStatement(sql)) {
-            statement.setString(1, usuario);
-            statement.setString(2, contraseña);
-            ResultSet rs = statement.executeQuery();
+    public static String validarLogin(String usuario, String contraseña)
+            throws SQLTransactionRollbackException, SQLTimeoutException, SQLException {
 
-            if (rs.next()) {
-                return rs.getString("rol");  // Ej: "Administrador" o "Recepcionista"
+        String verificarBloqueo = "SELECT intentos_fallidos, bloqueado_hasta FROM usuarios WHERE usuario = ?";
+        String sqlLogin = "SELECT r.nombre AS rol FROM usuarios u JOIN roles r ON u.rol_id = r.id WHERE u.usuario = ? AND u.contraseña = ?";
+        String actualizarIntentos = "UPDATE usuarios SET intentos_fallidos = ?, bloqueado_hasta = ? WHERE usuario = ?";
+        String resetIntentos = "UPDATE usuarios SET intentos_fallidos = 0, bloqueado_hasta = NULL WHERE usuario = ?";
+
+        try (Connection conn = ConexionBD.conectar()) {
+
+            PreparedStatement psBloqueo = conn.prepareStatement(verificarBloqueo);
+            psBloqueo.setString(1, usuario);
+            ResultSet rsBloqueo = psBloqueo.executeQuery();
+
+            if (rsBloqueo.next()) {
+                int intentos = rsBloqueo.getInt("intentos_fallidos");
+                Timestamp bloqueadoHasta = rsBloqueo.getTimestamp("bloqueado_hasta");
+
+                if (bloqueadoHasta != null && bloqueadoHasta.after(new Timestamp(System.currentTimeMillis()))) {
+                    long segundosRestantes = (bloqueadoHasta.getTime() - System.currentTimeMillis()) / 1000;
+                    JOptionPane.showMessageDialog(null,
+                            "Usuario bloqueado. Intente nuevamente en " + segundosRestantes + " segundos.");
+                    return null;
+                }
+            }
+
+            PreparedStatement psLogin = conn.prepareStatement(sqlLogin);
+            psLogin.setString(1, usuario);
+            psLogin.setString(2, contraseña);
+            ResultSet rsLogin = psLogin.executeQuery();
+
+            if (rsLogin.next()) {
+             
+                PreparedStatement psReset = conn.prepareStatement(resetIntentos);
+                psReset.setString(1, usuario);
+                psReset.executeUpdate();
+
+                RegistroBloqueos.registrar(usuario, 0, false, 0); // Log del desbloqueo
+                return rsLogin.getString("rol");
             } else {
+                
+                int nuevosIntentos = 1;
+                Timestamp nuevoBloqueo = null;
+
+                PreparedStatement psBloqueo2 = conn.prepareStatement(verificarBloqueo);
+                psBloqueo2.setString(1, usuario);
+                ResultSet rsBloqueo2 = psBloqueo2.executeQuery();
+
+                if (rsBloqueo2.next()) {
+                    nuevosIntentos = rsBloqueo2.getInt("intentos_fallidos") + 1;
+
+                    if (nuevosIntentos >= 3) {
+                        long tresMin = System.currentTimeMillis() + (3 * 60 * 1000);
+                        nuevoBloqueo = new Timestamp(tresMin);
+                        JOptionPane.showMessageDialog(null,
+                                "Usuario bloqueado por 3 minutos debido a intentos fallidos.");
+
+                        
+                        RegistroBloqueos.registrar(usuario, nuevosIntentos, true, 3 * 60 * 1000);
+                    } else {
+                        
+                        RegistroBloqueos.registrar(usuario, nuevosIntentos, false, 0);
+                    }
+                }
+
+                PreparedStatement psUpdate = conn.prepareStatement(actualizarIntentos);
+                psUpdate.setInt(1, nuevosIntentos);
+                psUpdate.setTimestamp(2, nuevoBloqueo);
+                psUpdate.setString(3, usuario);
+                psUpdate.executeUpdate();
+
                 return null;
             }
+
         } catch (SQLTransactionRollbackException e) {
             ManejadorErrores.tablasBloqueadas(e);
         } catch (SQLTimeoutException e) {
@@ -61,7 +126,6 @@ public class Login extends javax.swing.JFrame {
             ManejadorErrores.errorDesconocido(e);
         }
         return null;
-
     }
 
     public static void realizarLogin(JTextField userTxt, JPasswordField passTxt, JFrame loginFrame) throws SQLTransactionRollbackException, SQLTimeoutException, SQLException {

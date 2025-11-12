@@ -1,0 +1,14 @@
+[2025-10-31 11:40:26] Usuario: juan | Intentos: 1 | Estado: DESBLOQUEADO | Tiempo: Inmediato
+[2025-10-31 11:40:44] Usuario: juan | Intentos: 2 | Estado: DESBLOQUEADO | Tiempo: Inmediato
+[2025-10-31 11:41:06] Usuario: juan | Intentos: 3 | Estado: BLOQUEADO | Tiempo: 180s
+[2025-10-31 11:44:36] Usuario: juan | Intentos: 0 | Estado: DESBLOQUEADO | Tiempo: Inmediato
+[2025-10-31 12:30:19] Usuario: juan | Intentos: 1 | Estado: DESBLOQUEADO | Tiempo: Inmediato
+[2025-10-31 12:30:40] Usuario: juan | Intentos: 2 | Estado: DESBLOQUEADO | Tiempo: Inmediato
+[2025-10-31 12:31:01] Usuario: juan | Intentos: 3 | Estado: BLOQUEADO | Tiempo: 180s
+[2025-10-31 12:34:08] Usuario: juan | Intentos: 0 | Estado: DESBLOQUEADO | Tiempo: Inmediato
+[2025-10-31 12:39:48] Usuario: juan | Intentos: 1 | Estado: DESBLOQUEADO | Tiempo: Inmediato
+[2025-10-31 12:39:58] Usuario: juan | Intentos: 2 | Estado: DESBLOQUEADO | Tiempo: Inmediato
+[2025-10-31 12:40:12] Usuario: juan | Intentos: 3 | Estado: BLOQUEADO | Tiempo: 180s
+[2025-10-31 12:40:46] Usuario: paula | Intentos: 0 | Estado: DESBLOQUEADO | Tiempo: Inmediato
+[2025-11-07 09:21:28] Usuario: juan | Intentos: 4 | Estado: BLOQUEADO | Tiempo: 180s
+[2025-11-07 09:22:04] Usuario: paula | Intentos: 0 | Estado: DESBLOQUEADO | Tiempo: Inmediato

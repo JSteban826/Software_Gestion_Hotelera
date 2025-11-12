@@ -10,7 +10,7 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class DASHBOARD extends javax.swing.JFrame {
+public class DASHBOARD1 extends javax.swing.JFrame {
 
     Clientes cl1;
     Habitaciones hab1;
@@ -25,7 +25,7 @@ public class DASHBOARD extends javax.swing.JFrame {
     /**
      * Creates new form PRINCIPAL1
      */
-    public DASHBOARD() throws SQLException {
+    public DASHBOARD1() throws SQLException {
         initComponents();
         Panel_graficos.obtenerEstadosHabitaciones(jPanel_grafica_hab);
         Panel_graficos.mostrarReservasActivas(jPanel_grafica_reservas);
@@ -60,7 +60,7 @@ public class DASHBOARD extends javax.swing.JFrame {
             try {
                 Panel_graficos.MostrarClientes(lbl_cl, lbl_cl_rv);
             } catch (SQLException ex) {
-                Logger.getLogger(DASHBOARD.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(DASHBOARD1.class.getName()).log(Level.SEVERE, null, ex);
             }
         }).start();
     }
@@ -624,14 +624,16 @@ public class DASHBOARD extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(DASHBOARD.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(DASHBOARD1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(DASHBOARD.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(DASHBOARD1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(DASHBOARD.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(DASHBOARD1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(DASHBOARD.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(DASHBOARD1.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
 
@@ -639,9 +641,9 @@ public class DASHBOARD extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    new DASHBOARD().setVisible(true);
+                    new DASHBOARD1().setVisible(true);
                 } catch (SQLException ex) {
-                    Logger.getLogger(DASHBOARD.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(DASHBOARD1.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });
