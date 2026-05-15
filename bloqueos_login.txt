@@ -12,3 +12,6 @@
 [2025-10-31 12:40:46] Usuario: paula | Intentos: 0 | Estado: DESBLOQUEADO | Tiempo: Inmediato
 [2025-11-07 09:21:28] Usuario: juan | Intentos: 4 | Estado: BLOQUEADO | Tiempo: 180s
 [2025-11-07 09:22:04] Usuario: paula | Intentos: 0 | Estado: DESBLOQUEADO | Tiempo: Inmediato
+[2025-11-14 10:39:24] Usuario: juan | Intentos: 0 | Estado: DESBLOQUEADO | Tiempo: Inmediato
+[2026-01-19 16:28:58] Usuario: juan | Intentos: 1 | Estado: DESBLOQUEADO | Tiempo: Inmediato
+[2026-01-19 16:29:13] Usuario: juan | Intentos: 0 | Estado: DESBLOQUEADO | Tiempo: Inmediato
