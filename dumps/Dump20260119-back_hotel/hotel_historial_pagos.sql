@@ -1,0 +1,56 @@
+-- MySQL dump 10.13  Distrib 8.0.44, for Win64 (x86_64)
+--
+-- Host: database-hotel.mysql.database.azure.com    Database: hotel
+-- ------------------------------------------------------
+-- Server version	8.0.42-azure
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `historial_pagos`
+--
+
+DROP TABLE IF EXISTS `historial_pagos`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `historial_pagos` (
+  `id_pago` int NOT NULL AUTO_INCREMENT,
+  `id_cliente` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `valor_pago` decimal(10,2) DEFAULT NULL,
+  `estado_pago` enum('Pendiente','Pagada','Cancelado') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `fecha_pago` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_pago`),
+  KEY `id_cliente` (`id_cliente`),
+  CONSTRAINT `historial_pagos_ibfk_1` FOREIGN KEY (`id_cliente`) REFERENCES `clientes` (`Cedula`)
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `historial_pagos`
+--
+
+LOCK TABLES `historial_pagos` WRITE;
+/*!40000 ALTER TABLE `historial_pagos` DISABLE KEYS */;
+INSERT INTO `historial_pagos` VALUES (1,'1060598042',700000.00,'Pagada','2025-05-21 22:55:24'),(2,'1070464473',950000.00,'Pagada','2025-05-12 13:07:23'),(3,'1070464473',2400000.00,'Pagada','2025-05-22 01:55:50'),(4,'1060598042',4750000.00,'Pagada','2025-05-22 02:43:59'),(5,'1070464473',5600000.00,'Pagada','2025-05-29 14:34:40'),(6,'1070464473',3000000.00,'Pagada','2025-09-17 03:44:01'),(7,'1070464166',300000.00,'Pagada','2025-09-25 02:48:47'),(8,'1070464166',300000.00,'Pagada','2025-09-25 02:49:13'),(9,'1069714447',700000.00,'Pagada','2025-10-04 19:51:17'),(10,'1069714447',2500000.00,'Pagada','2025-10-04 20:05:11'),(11,'1070464473',1250000.00,'Pagada','2025-10-04 20:53:28'),(12,'1070464473',2500000.00,'Pagada','2025-10-16 02:18:51'),(13,'1070464473',1500000.00,'Pagada','2025-10-16 02:22:14'),(14,'1070464473',4750000.00,'Pagada','2025-10-16 02:36:18'),(15,'1070464473',2250000.00,'Pagada','2025-10-16 02:43:57'),(16,'1070464473',300000.00,'Pagada','2025-10-22 02:08:16');
+/*!40000 ALTER TABLE `historial_pagos` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2026-01-19 16:47:42
