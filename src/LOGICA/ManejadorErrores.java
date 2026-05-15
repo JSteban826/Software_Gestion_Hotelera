@@ -1,6 +1,7 @@
 package LOGICA;
 
-import javax.swing.JOptionPane;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class ManejadorErrores {
 
@@ -35,11 +36,11 @@ public class ManejadorErrores {
     public static void errorSelectSQL(Exception e) {
         Logger.registrarError(CodigoError.ERR_SQL_SELECT, e);
     }
-    
+
     public static void errorDeleteSQL(Exception e) {
         Logger.registrarError(CodigoError.ERR_DELETE_DATOS, e);
     }
-    
+
     public static void errorUpdateSQL(Exception e) {
         Logger.registrarError(CodigoError.ERR_MODIFICAR_DATOS, e);
     }
@@ -92,5 +93,21 @@ public class ManejadorErrores {
 
     public static void errorDesconocido(Exception e) {
         Logger.registrarError(CodigoError.ERR_NO_CONTROLADO, e);
+    }
+
+    public static void generarbackup(BackupException e) {
+        Logger.registrarError(CodigoError.ERR_BD_BACKUP, e);
+    }
+
+    public static void restorebackup(BackupException e) {
+        Logger.registrarError(CodigoError.ERR_BD_RESTORE, e);
+    }
+
+    public static void abrirarchivo (IOException e){
+        Logger.registrarError(CodigoError.ERR_ABRIR_ARCHIVO, e);
+    }
+    
+    public static void rutaarchivo (FileNotFoundException e){
+        Logger.registrarError(CodigoError.ERR_ARCHIVO_INEXISTENTE, e);
     }
 }

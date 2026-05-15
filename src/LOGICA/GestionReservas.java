@@ -67,7 +67,8 @@ public class GestionReservas {
 
         if (correoCliente != null && totalCOP > 0) {
             String montoUSD = convertirPesosADolares(totalCOP);
-            CorreoPago.enviarCorreo(correoCliente, montoUSD); // puede lanzar excepción
+            Locale idioma = Locale.getDefault();
+            CorreoPago.enviarCorreo(correoCliente, montoUSD, idioma); // puede lanzar excepción
 
             JOptionPane.showMessageDialog(null,
                     "Procesando pago para el cliente: " + correoCliente + "\nMonto: $" + montoUSD + " USD",

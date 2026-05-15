@@ -13,9 +13,8 @@ public class Logger {
         String log = "[" + LocalDateTime.now() + "] " + codigoError + " - " + mensaje;
 
         // Mostrar mensaje al usuario
-        //JOptionPane.showMessageDialog(null, "Ocurrió un error (" + codigoError + "): "  + mensaje);
         JOptionPane.showMessageDialog(null, "Ocurrió un error (" + codigoError + ")", "Error", JOptionPane.ERROR_MESSAGE);
-
+        JOptionPane.showMessageDialog(null, "Ocurrió un error (" + codigoError + "): " + mensaje);
         // Guardar en archivo de log
         try (FileWriter fw = new FileWriter("errores.log", true); PrintWriter pw = new PrintWriter(fw)) {
             pw.println(log);
@@ -24,4 +23,3 @@ public class Logger {
         }
     }
 }
-

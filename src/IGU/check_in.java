@@ -556,9 +556,7 @@ public class check_in extends javax.swing.JFrame {
                     || txt_habitacion.getText().trim().isEmpty()
                     || txt_dias.getText().trim().isEmpty()
                     || txt_llave.getText().trim().isEmpty()
-                    || txt_id_check_in.getText().trim().isEmpty()
-                    || txt_acompañantes.getText().trim().isEmpty()
-                    || txt_solicitudes.getText().trim().isEmpty()) {
+                    || txt_id_check_in.getText().trim().isEmpty()) {
 
                 throw new NullPointerException("Todos los campos deben estar completos.");
             }

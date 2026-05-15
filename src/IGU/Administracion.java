@@ -19,17 +19,19 @@ public class Administracion extends javax.swing.JFrame {
     HISTORIAL_ACCION acc;
     Historial_Pagos hispg;
     Historial_Politica hisplt;
+    Inventario in;
+    Backups bc;
 
     /**
      * Creates new form Administracion
      */
     public Administracion() {
         initComponents();
-         ingresos.setBorderPainted(false);
-        ingresos.setContentAreaFilled(false);
-        ingresos.setFocusPainted(false);
-        ingresos.setOpaque(false);
-        ingresos.setCursor(new Cursor(Cursor.HAND_CURSOR));
+         backups.setBorderPainted(false);
+        backups.setContentAreaFilled(false);
+        backups.setFocusPainted(false);
+        backups.setOpaque(false);
+        backups.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
          hist_reserva.setBorderPainted(false);
         hist_reserva.setContentAreaFilled(false);
@@ -48,7 +50,18 @@ public class Administracion extends javax.swing.JFrame {
         btn_hist_pago.setFocusPainted(false);
         btn_hist_pago.setOpaque(false);
         btn_hist_pago.setCursor(new Cursor(Cursor.HAND_CURSOR));
+          btninventa.setBorderPainted(false);
+        btninventa.setContentAreaFilled(false);
+        btninventa.setFocusPainted(false);
+        btninventa.setOpaque(false);
+        btninventa.setCursor(new Cursor(Cursor.HAND_CURSOR));
+             backups.setBorderPainted(false);
+        backups.setContentAreaFilled(false);
+        backups.setFocusPainted(false);
+        backups.setOpaque(false);
+        backups.setCursor(new Cursor(Cursor.HAND_CURSOR));
     
+        
     }
 
     /**
@@ -61,7 +74,7 @@ public class Administracion extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        ingresos = new javax.swing.JButton();
+        backups = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         hist_reserva = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
@@ -71,16 +84,20 @@ public class Administracion extends javax.swing.JFrame {
         btn_politica = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
+        ingresos = new javax.swing.JButton();
+        jLabel6 = new javax.swing.JLabel();
+        btninventa = new javax.swing.JButton();
+        jLabel7 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
 
-        ingresos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/images/transaction-history.png"))); // NOI18N
-        ingresos.setToolTipText("");
-        ingresos.addActionListener(new java.awt.event.ActionListener() {
+        backups.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/images/data-recovery.png"))); // NOI18N
+        backups.setToolTipText("");
+        backups.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ingresosActionPerformed(evt);
+                backupsActionPerformed(evt);
             }
         });
 
@@ -111,16 +128,16 @@ public class Administracion extends javax.swing.JFrame {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(58, 58, 58)
+                .addGap(145, 145, 145)
                 .addComponent(jLabel2)
-                .addContainerGap(82, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(16, 16, 16)
                 .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(28, 28, 28))
+                .addGap(18, 18, 18))
         );
 
         btn_hist_pago.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/images/payment.png"))); // NOI18N
@@ -146,11 +163,35 @@ public class Administracion extends javax.swing.JFrame {
         jLabel5.setForeground(new java.awt.Color(65, 104, 163));
         jLabel5.setText("Historial Pagos");
 
+        ingresos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/images/transaction-history.png"))); // NOI18N
+        ingresos.setToolTipText("");
+        ingresos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ingresosActionPerformed(evt);
+            }
+        });
+
+        jLabel6.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(65, 104, 163));
+        jLabel6.setText("Inventarios");
+
+        btninventa.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/images/privacy.png"))); // NOI18N
+        btninventa.setToolTipText("");
+        btninventa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btninventaActionPerformed(evt);
+            }
+        });
+
+        jLabel7.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
+        jLabel7.setForeground(new java.awt.Color(65, 104, 163));
+        jLabel7.setText("Backups");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+            .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
@@ -159,41 +200,75 @@ public class Administracion extends javax.swing.JFrame {
                     .addComponent(hist_reserva)
                     .addComponent(jLabel1)
                     .addComponent(btn_hist_pago))
+                .addGap(77, 77, 77)
+                .addComponent(ingresos)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btn_politica, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(ingresos, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.TRAILING))
-                .addGap(97, 97, 97))
+                .addComponent(btninventa)
+                .addGap(73, 73, 73))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addGap(78, 78, 78)
                 .addComponent(jLabel5)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel3)
-                .addGap(106, 106, 106))
+                .addGap(69, 69, 69)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btn_politica, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addGap(9, 9, 9)))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel7)
+                                .addGap(106, 106, 106))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel6)
+                                .addGap(93, 93, 93))))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(109, 109, 109)
+                        .addComponent(backups)
+                        .addContainerGap(73, Short.MAX_VALUE))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(ingresos, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(hist_reserva))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel4))
                 .addGap(28, 28, 28)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(btn_politica, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btn_hist_pago))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel5))
-                .addContainerGap(22, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(hist_reserva)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel1)
+                        .addGap(38, 38, 38)
+                        .addComponent(btn_hist_pago)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel5))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(9, 9, 9)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(ingresos, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btninventa, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(9, 9, 9)
+                                .addComponent(jLabel4))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(18, 18, 18)
+                                .addComponent(jLabel6)))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(16, 16, 16)
+                                .addComponent(btn_politica, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(26, 26, 26)
+                                .addComponent(backups, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel7))))
+                .addContainerGap(124, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -203,20 +278,17 @@ public class Administracion extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addGap(22, 22, 22))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void ingresosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ingresosActionPerformed
+    private void backupsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_backupsActionPerformed
         // TODO add your handling code here:
         
         acc = new HISTORIAL_ACCION ();
@@ -235,7 +307,7 @@ public class Administracion extends javax.swing.JFrame {
         //Agregar Accion a Historial
         HistorialManager historial_acciones = HistorialManagerSingleton.getInstancia();
         historial_acciones.registrarAccion("Ingreso a Historial Acciones");
-    }//GEN-LAST:event_ingresosActionPerformed
+    }//GEN-LAST:event_backupsActionPerformed
 
     private void hist_reservaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hist_reservaActionPerformed
         // TODO add your handling code here:
@@ -298,6 +370,14 @@ public class Administracion extends javax.swing.JFrame {
         historial_acciones.registrarAccion("Ingreso a Historial Politica de Datos");
     }//GEN-LAST:event_btn_politicaActionPerformed
 
+    private void ingresosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ingresosActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_ingresosActionPerformed
+
+    private void btninventaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btninventaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btninventaActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -334,8 +414,10 @@ public class Administracion extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton backups;
     private javax.swing.JButton btn_hist_pago;
     private javax.swing.JButton btn_politica;
+    private javax.swing.JButton btninventa;
     private javax.swing.JButton hist_reserva;
     private javax.swing.JButton ingresos;
     private javax.swing.JLabel jLabel1;
@@ -343,6 +425,8 @@ public class Administracion extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     // End of variables declaration//GEN-END:variables
